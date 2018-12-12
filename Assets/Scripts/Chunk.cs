@@ -91,6 +91,10 @@ public class Chunk {
 					chunkData[x,y,z].Draw();	
 				}
 		CombineQuads();
+
+		MeshCollider collider = chunk.gameObject.AddComponent(typeof(MeshCollider)) as MeshCollider;
+		collider.sharedMesh = chunk.transform.GetComponent<MeshFilter>().mesh;
+
 	}
 
 	// Use this for initialization

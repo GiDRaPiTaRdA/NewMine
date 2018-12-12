@@ -7,7 +7,7 @@ public class World : MonoBehaviour {
 	public Material textureAtlas;
 	public static int columnHeight = 16;
 	public static int chunkSize = 16;
-	public static int worldSize = 4;
+	public static int worldSize = 8;
 	public static Dictionary<string, Chunk> chunks;
 
 	public static string BuildChunkName(Vector3 v)
@@ -32,8 +32,9 @@ public class World : MonoBehaviour {
 		foreach(KeyValuePair<string, Chunk> c in chunks)
 		{
 			c.Value.DrawChunk();
-			yield return null;
+		
 		}
+			yield return null;
 		
 	}
 
