@@ -100,7 +100,7 @@ public class Chunk {
 	// Use this for initialization
 	public Chunk (Vector3 position, Material c) {
 		
-		chunk = new GameObject(World.BuildChunkName(position));
+		chunk = new GameObject(position.ToString());
 		chunk.transform.position = position;
 		cubeMaterial = c;
 		BuildChunk();

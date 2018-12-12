@@ -172,14 +172,13 @@ public class Block {
 										new Vector3((x - (int)position.x)*World.chunkSize, 
 											(y - (int)position.y)*World.chunkSize, 
 											(z - (int)position.z)*World.chunkSize);
-			string nName = World.BuildChunkName(neighbourChunkPos);
-
+		
 			x = ConvertBlockIndexToLocal(x);
 			y = ConvertBlockIndexToLocal(y);
 			z = ConvertBlockIndexToLocal(z);
 			
 			Chunk nChunk;
-			if(World.chunks.TryGetValue(nName, out nChunk))
+			if(World.chunks.TryGetValue(neighbourChunkPos, out nChunk))
 			{
 				chunks = nChunk.chunkData;
 			}

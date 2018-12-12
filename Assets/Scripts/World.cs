@@ -8,35 +8,35 @@ public class World : MonoBehaviour {
 	public static int columnHeight = 16;
 	public static int chunkSize = 16;
 	public static int worldSize = 8;
-	public static Dictionary<string, Chunk> chunks;
+	public static Dictionary<Vector3, Chunk> chunks;
 
-	public static string BuildChunkName(Vector3 v)
-	{
-		return (int)v.x + "_" + 
-			         (int)v.y + "_" + 
-			         (int)v.z;
-	}
+	//public static string BuildChunkName(Vector3 v)
+	//{
+	//	return (int)v.x + "_" + 
+	//		         (int)v.y + "_" + 
+	//		         (int)v.z;
+	//}
 
-	IEnumerator BuildChunkColumn()
-	{
-		for(int i = 0; i < columnHeight; i++)
-		{
-			Vector3 chunkPosition = new Vector3(this.transform.position.x, 
-												i*chunkSize, 
-												this.transform.position.z);
-			Chunk c = new Chunk(chunkPosition, textureAtlas);
-			c.chunk.transform.parent = this.transform;
-			chunks.Add(c.chunk.name, c);
-		}
+	//IEnumerator BuildChunkColumn()
+	//{
+	//	for(int i = 0; i < columnHeight; i++)
+	//	{
+	//		Vector3 chunkPosition = new Vector3(this.transform.position.x, 
+	//											i*chunkSize, 
+	//											this.transform.position.z);
+	//		Chunk c = new Chunk(chunkPosition, textureAtlas);
+	//		c.chunk.transform.parent = this.transform;
+	//		chunks.Add(c.chunk.transform.position, c);
+	//	}
 
-		foreach(KeyValuePair<string, Chunk> c in chunks)
-		{
-			c.Value.DrawChunk();
+	//	foreach(KeyValuePair<Vector3, Chunk> c in chunks)
+	//	{
+	//		c.Value.DrawChunk();
 		
-		}
-			yield return null;
+	//	}
+	//		yield return null;
 		
-	}
+	//}
 
 	IEnumerator BuildWorld()
 	{
@@ -47,11 +47,11 @@ public class World : MonoBehaviour {
 					Vector3 chunkPosition = new Vector3(x*chunkSize, y*chunkSize, z*chunkSize);
 					Chunk c = new Chunk(chunkPosition, textureAtlas);
 					c.chunk.transform.parent = this.transform;
-					chunks.Add(c.chunk.name, c);
+					chunks.Add(c.chunk.transform.position, c);
 					
 				}
 
-		foreach(KeyValuePair<string, Chunk> c in chunks)
+		foreach(KeyValuePair<Vector3, Chunk> c in chunks)
 		{
 			c.Value.DrawChunk();
 			yield return null;
@@ -61,7 +61,7 @@ public class World : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		chunks = new Dictionary<string, Chunk>();
+		chunks = new Dictionary<Vector3, Chunk>();
 		this.transform.position = Vector3.zero;
 		this.transform.rotation = Quaternion.identity;
 		StartCoroutine(BuildWorld());
