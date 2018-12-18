@@ -101,7 +101,8 @@ public class World : MonoBehaviour {
 			{
 			    
                 Destroy(c.chunk);
-				chunks.TryRemove(n, out c);
+			    c.Save();
+                chunks.TryRemove(n, out c);
 				yield return null;
 			}
 		}
