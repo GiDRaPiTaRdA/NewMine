@@ -37,26 +37,26 @@ public class CreateQuads : MonoBehaviour {
 		Vector2 uv01;
 		Vector2 uv11;
 
-		if(bType == BlockType.GRASS && side == Cubeside.TOP)
+		if(this.bType == BlockType.GRASS && side == Cubeside.TOP)
 		{
-			uv00 = blockUVs[0,0];
-			uv10 = blockUVs[0,1];
-			uv01 = blockUVs[0,2];
-			uv11 = blockUVs[0,3];
+			uv00 = this.blockUVs[0,0];
+			uv10 = this.blockUVs[0,1];
+			uv01 = this.blockUVs[0,2];
+			uv11 = this.blockUVs[0,3];
 		}
-		else if(bType == BlockType.GRASS && side == Cubeside.BOTTOM)
+		else if(this.bType == BlockType.GRASS && side == Cubeside.BOTTOM)
 		{
-			uv00 = blockUVs[(int)(BlockType.DIRT+1),0];
-			uv10 = blockUVs[(int)(BlockType.DIRT+1),1];
-			uv01 = blockUVs[(int)(BlockType.DIRT+1),2];
-			uv11 = blockUVs[(int)(BlockType.DIRT+1),3];
+			uv00 = this.blockUVs[(int)(BlockType.DIRT+1),0];
+			uv10 = this.blockUVs[(int)(BlockType.DIRT+1),1];
+			uv01 = this.blockUVs[(int)(BlockType.DIRT+1),2];
+			uv11 = this.blockUVs[(int)(BlockType.DIRT+1),3];
 		}
 		else
 		{
-			uv00 = blockUVs[(int)(bType+1),0];
-			uv10 = blockUVs[(int)(bType+1),1];
-			uv01 = blockUVs[(int)(bType+1),2];
-			uv11 = blockUVs[(int)(bType+1),3];
+			uv00 = this.blockUVs[(int)(this.bType+1),0];
+			uv10 = this.blockUVs[(int)(this.bType+1),1];
+			uv01 = this.blockUVs[(int)(this.bType+1),2];
+			uv11 = this.blockUVs[(int)(this.bType+1),3];
 		}
 
 		//all possible vertices 
@@ -127,14 +127,14 @@ public class CreateQuads : MonoBehaviour {
      	MeshFilter meshFilter = (MeshFilter) quad.AddComponent(typeof(MeshFilter));
 		meshFilter.mesh = mesh;
 		MeshRenderer renderer = quad.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
-		renderer.material = cubeMaterial;
+		renderer.material = this.cubeMaterial;
 	}
 
 	void CombineQuads()
 	{
 		
 		//1. Combine all children meshes
-		MeshFilter[] meshFilters = GetComponentsInChildren<MeshFilter>();
+		MeshFilter[] meshFilters = this.GetComponentsInChildren<MeshFilter>();
         CombineInstance[] combine = new CombineInstance[meshFilters.Length];
         int i = 0;
         while (i < meshFilters.Length) {
@@ -152,7 +152,7 @@ public class CreateQuads : MonoBehaviour {
 
         //4. Create a renderer for the parent
 		MeshRenderer renderer = this.gameObject.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
-		renderer.material = cubeMaterial;
+		renderer.material = this.cubeMaterial;
 
 		//5. Delete all uncombined children
 		foreach (Transform quad in this.transform) {
@@ -163,18 +163,18 @@ public class CreateQuads : MonoBehaviour {
 
 	void CreateCube()
 	{
-		CreateQuad(Cubeside.FRONT);
-		CreateQuad(Cubeside.BACK);
-		CreateQuad(Cubeside.TOP);
-		CreateQuad(Cubeside.BOTTOM);
-		CreateQuad(Cubeside.LEFT);
-		CreateQuad(Cubeside.RIGHT);
-		CombineQuads();
+	    this.CreateQuad(Cubeside.FRONT);
+	    this.CreateQuad(Cubeside.BACK);
+	    this.CreateQuad(Cubeside.TOP);
+	    this.CreateQuad(Cubeside.BOTTOM);
+	    this.CreateQuad(Cubeside.LEFT);
+	    this.CreateQuad(Cubeside.RIGHT);
+	    this.CombineQuads();
 	}
 
 	// Use this for initialization
 	void Start () {
-		CreateCube();
+	    this.CreateCube();
 	}
 	
 	// Update is called once per frame

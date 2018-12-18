@@ -160,7 +160,7 @@ namespace Realtime.Messaging.Internal
             if (comparer == null)
                 throw new ArgumentNullException("comparer");
 
-            InitializeFromCollection(collection);
+            this.InitializeFromCollection(collection);
         }
 
         private void InitializeFromCollection(IEnumerable<KeyValuePair<TKey, TValue>> collection)
@@ -171,9 +171,9 @@ namespace Realtime.Messaging.Internal
                 if (pair.Key == null)
                     throw new ArgumentNullException("key");
 
-                if (!TryAddInternal(pair.Key, pair.Value, false, false, out dummy))
+                if (!this.TryAddInternal(pair.Key, pair.Value, false, false, out dummy))
                 {
-                    throw new ArgumentException(GetResource("ConcurrentDictionary_SourceContainsDuplicateKeys"));
+                    throw new ArgumentException(this.GetResource("ConcurrentDictionary_SourceContainsDuplicateKeys"));
                 }
             }
         }
@@ -200,11 +200,11 @@ namespace Realtime.Messaging.Internal
         {
             if (concurrencyLevel < 1)
             {
-                throw new ArgumentOutOfRangeException("concurrencyLevel", GetResource("ConcurrentDictionary_ConcurrencyLevelMustBePositive"));
+                throw new ArgumentOutOfRangeException("concurrencyLevel", this.GetResource("ConcurrentDictionary_ConcurrencyLevelMustBePositive"));
             }
             if (capacity < 0)
             {
-                throw new ArgumentOutOfRangeException("capacity", GetResource("ConcurrentDictionary_CapacityMustNotBeNegative"));
+                throw new ArgumentOutOfRangeException("capacity", this.GetResource("ConcurrentDictionary_CapacityMustNotBeNegative"));
             }
             if (comparer == null)
                 throw new ArgumentNullException("comparer");
@@ -216,15 +216,15 @@ namespace Realtime.Messaging.Internal
                 capacity = concurrencyLevel;
             }
 
-            m_locks = new object[concurrencyLevel];
-            for (int i = 0;i < m_locks.Length;i++)
+            this.m_locks = new object[concurrencyLevel];
+            for (int i = 0;i < this.m_locks.Length;i++)
             {
-                m_locks[i] = new object();
+                this.m_locks[i] = new object();
             }
 
-            m_countPerLock = new int[m_locks.Length];
-            m_buckets = new Node[capacity];
-            m_comparer = comparer;
+            this.m_countPerLock = new int[this.m_locks.Length];
+            this.m_buckets = new Node[capacity];
+            this.m_comparer = comparer;
         }
 
 
@@ -247,7 +247,7 @@ namespace Realtime.Messaging.Internal
             if (key == null)
                 throw new ArgumentNullException("key");
             TValue dummy;
-            return TryAddInternal(key, value, false, true, out dummy);
+            return this.TryAddInternal(key, value, false, true, out dummy);
         }
 
         /// <summary> 
@@ -266,7 +266,7 @@ namespace Realtime.Messaging.Internal
                 throw new ArgumentNullException("key");
 
             TValue throwAwayValue;
-            return TryGetValue(key, out throwAwayValue);
+            return this.TryGetValue(key, out throwAwayValue);
         }
 
         /// <summary> 
@@ -286,7 +286,7 @@ namespace Realtime.Messaging.Internal
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            return TryRemoveInternal(key, out value, false, default(TValue));
+            return this.TryRemoveInternal(key, out value, false, default(TValue));
         }
 
         /// <summary>
@@ -303,26 +303,26 @@ namespace Realtime.Messaging.Internal
         {
             while (true)
             {
-                Node[] buckets = m_buckets;
+                Node[] buckets = this.m_buckets;
 
                 int bucketNo, lockNo;
-                GetBucketAndLockNo(m_comparer.GetHashCode(key), out bucketNo, out lockNo, buckets.Length);
+                this.GetBucketAndLockNo(this.m_comparer.GetHashCode(key), out bucketNo, out lockNo, buckets.Length);
 
-                lock (m_locks[lockNo])
+                lock (this.m_locks[lockNo])
                 {
                     // If the table just got resized, we may not be holding the right lock, and must retry. 
                     // This should be a rare occurence.
-                    if (buckets != m_buckets)
+                    if (buckets != this.m_buckets)
                     {
                         continue;
                     }
 
                     Node prev = null;
-                    for (Node curr = m_buckets[bucketNo];curr != null;curr = curr.m_next)
+                    for (Node curr = this.m_buckets[bucketNo];curr != null;curr = curr.m_next)
                     {
-                        Assert((prev == null && curr == m_buckets[bucketNo]) || prev.m_next == curr);
+                        this.Assert((prev == null && curr == this.m_buckets[bucketNo]) || prev.m_next == curr);
 
-                        if (m_comparer.Equals(curr.m_key, key))
+                        if (this.m_comparer.Equals(curr.m_key, key))
                         {
                             if (matchValue)
                             {
@@ -336,7 +336,7 @@ namespace Realtime.Messaging.Internal
 
                             if (prev == null)
                             {
-                                m_buckets[bucketNo] = curr.m_next;
+                                this.m_buckets[bucketNo] = curr.m_next;
                             }
                             else
                             {
@@ -344,7 +344,7 @@ namespace Realtime.Messaging.Internal
                             }
 
                             value = curr.m_value;
-                            m_countPerLock[lockNo]--;
+                            this.m_countPerLock[lockNo]--;
                             return true;
                         }
                         prev = curr;
@@ -377,8 +377,8 @@ namespace Realtime.Messaging.Internal
             int bucketNo, lockNoUnused;
 
             // We must capture the m_buckets field in a local variable. It is set to a new table on each table resize. 
-            Node[] buckets = m_buckets;
-            GetBucketAndLockNo(m_comparer.GetHashCode(key), out bucketNo, out lockNoUnused, buckets.Length);
+            Node[] buckets = this.m_buckets;
+            this.GetBucketAndLockNo(this.m_comparer.GetHashCode(key), out bucketNo, out lockNoUnused, buckets.Length);
 
             // We can get away w/out a lock here.
             Node n = buckets[bucketNo];
@@ -387,7 +387,7 @@ namespace Realtime.Messaging.Internal
             Thread.MemoryBarrier();
             while (n != null)
             {
-                if (m_comparer.Equals(n.m_key, key))
+                if (this.m_comparer.Equals(n.m_key, key))
                 {
                     value = n.m_value;
                     return true;
@@ -419,7 +419,7 @@ namespace Realtime.Messaging.Internal
             if (key == null)
                 throw new ArgumentNullException("key");
 
-            int hashcode = m_comparer.GetHashCode(key);
+            int hashcode = this.m_comparer.GetHashCode(key);
             IEqualityComparer<TValue> valueComparer = EqualityComparer<TValue>.Default;
 
             while (true)
@@ -427,14 +427,14 @@ namespace Realtime.Messaging.Internal
                 int bucketNo;
                 int lockNo;
 
-                Node[] buckets = m_buckets;
-                GetBucketAndLockNo(hashcode, out bucketNo, out lockNo, buckets.Length);
+                Node[] buckets = this.m_buckets;
+                this.GetBucketAndLockNo(hashcode, out bucketNo, out lockNo, buckets.Length);
 
-                lock (m_locks[lockNo])
+                lock (this.m_locks[lockNo])
                 {
                     // If the table just got resized, we may not be holding the right lock, and must retry. 
                     // This should be a rare occurence.
-                    if (buckets != m_buckets)
+                    if (buckets != this.m_buckets)
                     {
                         continue;
                     }
@@ -443,8 +443,8 @@ namespace Realtime.Messaging.Internal
                     Node prev = null;
                     for (Node node = buckets[bucketNo];node != null;node = node.m_next)
                     {
-                        Assert((prev == null && node == m_buckets[bucketNo]) || prev.m_next == node);
-                        if (m_comparer.Equals(node.m_key, key))
+                        this.Assert((prev == null && node == this.m_buckets[bucketNo]) || prev.m_next == node);
+                        if (this.m_comparer.Equals(node.m_key, key))
                         {
                             if (valueComparer.Equals(node.m_value, comparisonValue))
                             {
@@ -485,14 +485,14 @@ namespace Realtime.Messaging.Internal
             int locksAcquired = 0;
             try
             {
-                AcquireAllLocks(ref locksAcquired);
+                this.AcquireAllLocks(ref locksAcquired);
 
-                m_buckets = new Node[DEFAULT_CAPACITY];
-                Array.Clear(m_countPerLock, 0, m_countPerLock.Length);
+                this.m_buckets = new Node[DEFAULT_CAPACITY];
+                Array.Clear(this.m_countPerLock, 0, this.m_countPerLock.Length);
             }
             finally
             {
-                ReleaseLocks(0, locksAcquired);
+                this.ReleaseLocks(0, locksAcquired);
             }
         }
 
@@ -522,30 +522,30 @@ namespace Realtime.Messaging.Internal
             if (array == null)
                 throw new ArgumentNullException("array");
             if (index < 0)
-                throw new ArgumentOutOfRangeException("index", GetResource("ConcurrentDictionary_IndexIsNegative"));
+                throw new ArgumentOutOfRangeException("index", this.GetResource("ConcurrentDictionary_IndexIsNegative"));
 
             int locksAcquired = 0;
             try
             {
-                AcquireAllLocks(ref locksAcquired);
+                this.AcquireAllLocks(ref locksAcquired);
 
                 int count = 0;
 
-                for (int i = 0;i < m_locks.Length;i++)
+                for (int i = 0;i < this.m_locks.Length;i++)
                 {
-                    count += m_countPerLock[i];
+                    count += this.m_countPerLock[i];
                 }
 
                 if (array.Length - count < index || count < 0) //"count" itself or "count + index" can overflow
                 {
-                    throw new ArgumentException(GetResource("ConcurrentDictionary_ArrayNotLargeEnough"));
+                    throw new ArgumentException(this.GetResource("ConcurrentDictionary_ArrayNotLargeEnough"));
                 }
 
-                CopyToPairs(array, index);
+                this.CopyToPairs(array, index);
             }
             finally
             {
-                ReleaseLocks(0, locksAcquired);
+                this.ReleaseLocks(0, locksAcquired);
             }
         }
 
@@ -560,24 +560,24 @@ namespace Realtime.Messaging.Internal
             int locksAcquired = 0;
             try
             {
-                AcquireAllLocks(ref locksAcquired);
+                this.AcquireAllLocks(ref locksAcquired);
                 int count = 0;
                 checked
                 {
-                    for (int i = 0;i < m_locks.Length;i++)
+                    for (int i = 0;i < this.m_locks.Length;i++)
                     {
-                        count += m_countPerLock[i];
+                        count += this.m_countPerLock[i];
                     }
                 }
 
                 KeyValuePair<TKey, TValue>[] array = new KeyValuePair<TKey, TValue>[count];
 
-                CopyToPairs(array, 0);
+                this.CopyToPairs(array, 0);
                 return array;
             }
             finally
             {
-                ReleaseLocks(0, locksAcquired);
+                this.ReleaseLocks(0, locksAcquired);
             }
         }
 
@@ -588,7 +588,7 @@ namespace Realtime.Messaging.Internal
         /// </summary>
         private void CopyToPairs(KeyValuePair<TKey, TValue>[] array, int index)
         {
-            Node[] buckets = m_buckets;
+            Node[] buckets = this.m_buckets;
             for (int i = 0;i < buckets.Length;i++)
             {
                 for (Node current = buckets[i];current != null;current = current.m_next)
@@ -606,7 +606,7 @@ namespace Realtime.Messaging.Internal
         /// </summary>
         private void CopyToEntries(DictionaryEntry[] array, int index)
         {
-            Node[] buckets = m_buckets;
+            Node[] buckets = this.m_buckets;
             for (int i = 0;i < buckets.Length;i++)
             {
                 for (Node current = buckets[i];current != null;current = current.m_next)
@@ -624,7 +624,7 @@ namespace Realtime.Messaging.Internal
         /// </summary>
         private void CopyToObjects(object[] array, int index)
         {
-            Node[] buckets = m_buckets;
+            Node[] buckets = this.m_buckets;
             for (int i = 0;i < buckets.Length;i++)
             {
                 for (Node current = buckets[i];current != null;current = current.m_next)
@@ -646,7 +646,7 @@ namespace Realtime.Messaging.Internal
         /// </remarks> 
         public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
         {
-            Node[] buckets = m_buckets;
+            Node[] buckets = this.m_buckets;
 
             for (int i = 0;i < buckets.Length;i++)
             {
@@ -669,14 +669,14 @@ namespace Realtime.Messaging.Internal
         /// </summary>
         private bool TryAddInternal(TKey key, TValue value, bool updateIfExists, bool acquireLock, out TValue resultingValue)
         {
-            int hashcode = m_comparer.GetHashCode(key);
+            int hashcode = this.m_comparer.GetHashCode(key);
 
             while (true)
             {
                 int bucketNo, lockNo;
 
-                Node[] buckets = m_buckets;
-                GetBucketAndLockNo(hashcode, out bucketNo, out lockNo, buckets.Length);
+                Node[] buckets = this.m_buckets;
+                this.GetBucketAndLockNo(hashcode, out bucketNo, out lockNo, buckets.Length);
 
                 bool resizeDesired = false;
                 bool lockTaken = false;
@@ -684,13 +684,13 @@ namespace Realtime.Messaging.Internal
                 {
                     if (acquireLock)
                     {
-                        Monitor.Enter(m_locks[lockNo]);
+                        Monitor.Enter(this.m_locks[lockNo]);
                         lockTaken = true;
                     }
 
                     // If the table just got resized, we may not be holding the right lock, and must retry. 
                     // This should be a rare occurence. 
-                    if (buckets != m_buckets)
+                    if (buckets != this.m_buckets)
                     {
                         continue;
                     }
@@ -699,8 +699,8 @@ namespace Realtime.Messaging.Internal
                     Node prev = null;
                     for (Node node = buckets[bucketNo];node != null;node = node.m_next)
                     {
-                        Assert((prev == null && node == m_buckets[bucketNo]) || prev.m_next == node);
-                        if (m_comparer.Equals(node.m_key, key))
+                        this.Assert((prev == null && node == this.m_buckets[bucketNo]) || prev.m_next == node);
+                        if (this.m_comparer.Equals(node.m_key, key))
                         {
                             // The key was found in the dictionary. If updates are allowed, update the value for that key.
                             // We need to create a new node for the update, in order to support TValue types that cannot
@@ -731,7 +731,7 @@ namespace Realtime.Messaging.Internal
                     buckets[bucketNo] = new Node(key, value, hashcode, buckets[bucketNo]);
                     checked
                     {
-                        m_countPerLock[lockNo]++;
+                        this.m_countPerLock[lockNo]++;
                     }
 
                     // 
@@ -739,7 +739,7 @@ namespace Realtime.Messaging.Internal
                     // Note: the formula is chosen to avoid overflow, but has a small inaccuracy due to 
                     // rounding.
                     //
-                    if (m_countPerLock[lockNo] > buckets.Length / m_locks.Length)
+                    if (this.m_countPerLock[lockNo] > buckets.Length / this.m_locks.Length)
                     {
                         resizeDesired = true;
                     }
@@ -747,7 +747,7 @@ namespace Realtime.Messaging.Internal
                 finally
                 {
                     if (lockTaken)
-                        Monitor.Exit(m_locks[lockNo]);
+                        Monitor.Exit(this.m_locks[lockNo]);
                 }
 
                 //
@@ -760,7 +760,7 @@ namespace Realtime.Messaging.Internal
                 //
                 if (resizeDesired)
                 {
-                    GrowTable(buckets);
+                    this.GrowTable(buckets);
                 }
 
                 resultingValue = value;
@@ -786,7 +786,7 @@ namespace Realtime.Messaging.Internal
             get
             {
                 TValue value;
-                if (!TryGetValue(key, out value))
+                if (!this.TryGetValue(key, out value))
                 {
                     throw new KeyNotFoundException();
                 }
@@ -797,7 +797,7 @@ namespace Realtime.Messaging.Internal
                 if (key == null)
                     throw new ArgumentNullException("key");
                 TValue dummy;
-                TryAddInternal(key, value, true, true, out dummy);
+                this.TryAddInternal(key, value, true, true, out dummy);
             }
         }
 
@@ -822,19 +822,19 @@ namespace Realtime.Messaging.Internal
                 try
                 {
                     // Acquire all locks
-                    AcquireAllLocks(ref acquiredLocks);
+                    this.AcquireAllLocks(ref acquiredLocks);
 
                     // Compute the count, we allow overflow 
-                    for (int i = 0;i < m_countPerLock.Length;i++)
+                    for (int i = 0;i < this.m_countPerLock.Length;i++)
                     {
-                        count += m_countPerLock[i];
+                        count += this.m_countPerLock[i];
                     }
 
                 }
                 finally
                 {
                     // Release locks that have been acquired earlier 
-                    ReleaseLocks(0, acquiredLocks);
+                    this.ReleaseLocks(0, acquiredLocks);
                 }
 
                 return count;
@@ -864,11 +864,12 @@ namespace Realtime.Messaging.Internal
                 throw new ArgumentNullException("valueFactory");
 
             TValue resultingValue;
-            if (TryGetValue(key, out resultingValue))
+            if (this.TryGetValue(key, out resultingValue))
             {
                 return resultingValue;
             }
-            TryAddInternal(key, valueFactory(key), false, true, out resultingValue);
+
+            this.TryAddInternal(key, valueFactory(key), false, true, out resultingValue);
             return resultingValue;
         }
 
@@ -890,7 +891,7 @@ namespace Realtime.Messaging.Internal
                 throw new ArgumentNullException("key");
 
             TValue resultingValue;
-            TryAddInternal(key, value, false, true, out resultingValue);
+            this.TryAddInternal(key, value, false, true, out resultingValue);
             return resultingValue;
         }
 
@@ -926,11 +927,11 @@ namespace Realtime.Messaging.Internal
             while (true)
             {
                 TValue oldValue;
-                if (TryGetValue(key, out oldValue))
+                if (this.TryGetValue(key, out oldValue))
                 //key exists, try to update 
                 {
                     newValue = updateValueFactory(key, oldValue);
-                    if (TryUpdate(key, newValue, oldValue))
+                    if (this.TryUpdate(key, newValue, oldValue))
                     {
                         return newValue;
                     }
@@ -938,7 +939,7 @@ namespace Realtime.Messaging.Internal
                 else //try add
                 {
                     newValue = addValueFactory(key);
-                    if (TryAddInternal(key, newValue, false, true, out resultingValue))
+                    if (this.TryAddInternal(key, newValue, false, true, out resultingValue))
                     {
                         return resultingValue;
                     }
@@ -973,18 +974,18 @@ namespace Realtime.Messaging.Internal
             while (true)
             {
                 TValue oldValue;
-                if (TryGetValue(key, out oldValue))
+                if (this.TryGetValue(key, out oldValue))
                 //key exists, try to update 
                 {
                     newValue = updateValueFactory(key, oldValue);
-                    if (TryUpdate(key, newValue, oldValue))
+                    if (this.TryUpdate(key, newValue, oldValue))
                     {
                         return newValue;
                     }
                 }
                 else //try add
                 {
-                    if (TryAddInternal(key, addValue, false, true, out resultingValue))
+                    if (this.TryAddInternal(key, addValue, false, true, out resultingValue))
                     {
                         return resultingValue;
                     }
@@ -1007,11 +1008,11 @@ namespace Realtime.Messaging.Internal
                 try
                 {
                     // Acquire all locks 
-                    AcquireAllLocks(ref acquiredLocks);
+                    this.AcquireAllLocks(ref acquiredLocks);
 
-                    for (int i = 0;i < m_countPerLock.Length;i++)
+                    for (int i = 0;i < this.m_countPerLock.Length;i++)
                     {
-                        if (m_countPerLock[i] != 0)
+                        if (this.m_countPerLock[i] != 0)
                         {
                             return false;
                         }
@@ -1020,7 +1021,7 @@ namespace Realtime.Messaging.Internal
                 finally
                 {
                     // Release locks that have been acquired earlier 
-                    ReleaseLocks(0, acquiredLocks);
+                    this.ReleaseLocks(0, acquiredLocks);
                 }
 
                 return true;
@@ -1044,9 +1045,9 @@ namespace Realtime.Messaging.Internal
         /// cref="ConcurrentDictionary{TKey,TValue}"/>.</exception>
         void IDictionary<TKey, TValue>.Add(TKey key, TValue value)
         {
-            if (!TryAdd(key, value))
+            if (!this.TryAdd(key, value))
             {
-                throw new ArgumentException(GetResource("ConcurrentDictionary_KeyAlreadyExisted"));
+                throw new ArgumentException(this.GetResource("ConcurrentDictionary_KeyAlreadyExisted"));
             }
         }
 
@@ -1065,7 +1066,7 @@ namespace Realtime.Messaging.Internal
         bool IDictionary<TKey, TValue>.Remove(TKey key)
         {
             TValue throwAwayValue;
-            return TryRemove(key, out throwAwayValue);
+            return this.TryRemove(key, out throwAwayValue);
         }
 
         /// <summary>
@@ -1076,7 +1077,7 @@ namespace Realtime.Messaging.Internal
         /// <see cref="T:System.Collections.Generic.Dictionary{TKey,TValue}"/>.</value> 
         public ICollection<TKey> Keys
         {
-            get { return GetKeys(); }
+            get { return this.GetKeys(); }
         }
 
         /// <summary>
@@ -1088,7 +1089,7 @@ namespace Realtime.Messaging.Internal
         /// <see cref="T:System.Collections.Generic.Dictionary{TKey,TValue}"/>.</value> 
         public ICollection<TValue> Values
         {
-            get { return GetValues(); }
+            get { return this.GetValues(); }
         }
         #endregion
 
@@ -1125,7 +1126,7 @@ namespace Realtime.Messaging.Internal
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> keyValuePair)
         {
             TValue value;
-            if (!TryGetValue(keyValuePair.Key, out value))
+            if (!this.TryGetValue(keyValuePair.Key, out value))
             {
                 return false;
             }
@@ -1158,10 +1159,10 @@ namespace Realtime.Messaging.Internal
         bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> keyValuePair)
         {
             if (keyValuePair.Key == null)
-                throw new ArgumentNullException(GetResource("ConcurrentDictionary_ItemKeyIsNull"));
+                throw new ArgumentNullException(this.GetResource("ConcurrentDictionary_ItemKeyIsNull"));
 
             TValue throwAwayValue;
-            return TryRemoveInternal(keyValuePair.Key, out throwAwayValue, true, keyValuePair.Value);
+            return this.TryRemoveInternal(keyValuePair.Key, out throwAwayValue, true, keyValuePair.Value);
         }
 
         #endregion
@@ -1208,7 +1209,7 @@ namespace Realtime.Messaging.Internal
             if (key == null)
                 throw new ArgumentNullException("key");
             if (!(key is TKey))
-                throw new ArgumentException(GetResource("ConcurrentDictionary_TypeOfKeyIncorrect"));
+                throw new ArgumentException(this.GetResource("ConcurrentDictionary_TypeOfKeyIncorrect"));
 
             TValue typedValue;
             try
@@ -1217,7 +1218,7 @@ namespace Realtime.Messaging.Internal
             }
             catch (InvalidCastException)
             {
-                throw new ArgumentException(GetResource("ConcurrentDictionary_TypeOfValueIncorrect"));
+                throw new ArgumentException(this.GetResource("ConcurrentDictionary_TypeOfValueIncorrect"));
             }
 
             ((IDictionary<TKey, TValue>)this).Add((TKey)key, typedValue);
@@ -1284,7 +1285,7 @@ namespace Realtime.Messaging.Internal
         /// cref="T:System.Collections.Generic.IDictionary{TKey,TValue}"/>.</value>
         ICollection IDictionary.Keys
         {
-            get { return GetKeys(); }
+            get { return this.GetKeys(); }
         }
 
         /// <summary> 
@@ -1314,7 +1315,7 @@ namespace Realtime.Messaging.Internal
         /// cref="T:System.Collections.IDictionary"/>.</value>
         ICollection IDictionary.Values
         {
-            get { return GetValues(); }
+            get { return this.GetValues(); }
         }
 
         /// <summary> 
@@ -1356,9 +1357,9 @@ namespace Realtime.Messaging.Internal
                     throw new ArgumentNullException("key");
 
                 if (!(key is TKey))
-                    throw new ArgumentException(GetResource("ConcurrentDictionary_TypeOfKeyIncorrect"));
+                    throw new ArgumentException(this.GetResource("ConcurrentDictionary_TypeOfKeyIncorrect"));
                 if (!(value is TValue))
-                    throw new ArgumentException(GetResource("ConcurrentDictionary_TypeOfValueIncorrect"));
+                    throw new ArgumentException(this.GetResource("ConcurrentDictionary_TypeOfValueIncorrect"));
 
                 ((ConcurrentDictionary<TKey, TValue>)this)[(TKey)key] = (TValue)value;
             }
@@ -1391,23 +1392,23 @@ namespace Realtime.Messaging.Internal
             if (array == null)
                 throw new ArgumentNullException("array");
             if (index < 0)
-                throw new ArgumentOutOfRangeException("index", GetResource("ConcurrentDictionary_IndexIsNegative"));
+                throw new ArgumentOutOfRangeException("index", this.GetResource("ConcurrentDictionary_IndexIsNegative"));
 
             int locksAcquired = 0;
             try
             {
-                AcquireAllLocks(ref locksAcquired);
+                this.AcquireAllLocks(ref locksAcquired);
 
                 int count = 0;
 
-                for (int i = 0;i < m_locks.Length;i++)
+                for (int i = 0;i < this.m_locks.Length;i++)
                 {
-                    count += m_countPerLock[i];
+                    count += this.m_countPerLock[i];
                 }
 
                 if (array.Length - count < index || count < 0) //"count" itself or "count + index" can overflow
                 {
-                    throw new ArgumentException(GetResource("ConcurrentDictionary_ArrayNotLargeEnough"));
+                    throw new ArgumentException(this.GetResource("ConcurrentDictionary_ArrayNotLargeEnough"));
                 }
 
                 // To be consistent with the behavior of ICollection.CopyTo() in Dictionary<TKey,TValue>, 
@@ -1419,29 +1420,29 @@ namespace Realtime.Messaging.Internal
                 KeyValuePair<TKey, TValue>[] pairs = array as KeyValuePair<TKey, TValue>[];
                 if (pairs != null)
                 {
-                    CopyToPairs(pairs, index);
+                    this.CopyToPairs(pairs, index);
                     return;
                 }
 
                 DictionaryEntry[] entries = array as DictionaryEntry[];
                 if (entries != null)
                 {
-                    CopyToEntries(entries, index);
+                    this.CopyToEntries(entries, index);
                     return;
                 }
 
                 object[] objects = array as object[];
                 if (objects != null)
                 {
-                    CopyToObjects(objects, index);
+                    this.CopyToObjects(objects, index);
                     return;
                 }
 
-                throw new ArgumentException(GetResource("ConcurrentDictionary_ArrayIncorrectType"), "array");
+                throw new ArgumentException(this.GetResource("ConcurrentDictionary_ArrayIncorrectType"), "array");
             }
             finally
             {
-                ReleaseLocks(0, locksAcquired);
+                this.ReleaseLocks(0, locksAcquired);
             }
         }
 
@@ -1486,10 +1487,10 @@ namespace Realtime.Messaging.Internal
             try
             {
                 // The thread that first obtains m_locks[0] will be the one doing the resize operation 
-                AcquireLocks(0, 1, ref locksAcquired);
+                this.AcquireLocks(0, 1, ref locksAcquired);
 
                 // Make sure nobody resized the table while we were waiting for lock 0:
-                if (buckets != m_buckets)
+                if (buckets != this.m_buckets)
                 {
                     // We assume that since the table reference is different, it was already resized. If we ever 
                     // decide to do table shrinking, or replace the table for other reasons, we will have to revisit 
@@ -1514,7 +1515,7 @@ namespace Realtime.Messaging.Internal
                             newLength += 2;
                         }
 
-                        Assert(newLength % 2 != 0);
+                        this.Assert(newLength % 2 != 0);
                     }
                 }
                 catch (OverflowException)
@@ -1524,10 +1525,10 @@ namespace Realtime.Messaging.Internal
                 }
 
                 Node[] newBuckets = new Node[newLength];
-                int[] newCountPerLock = new int[m_locks.Length];
+                int[] newCountPerLock = new int[this.m_locks.Length];
 
                 // Now acquire all other locks for the table
-                AcquireLocks(1, m_locks.Length, ref locksAcquired);
+                this.AcquireLocks(1, this.m_locks.Length, ref locksAcquired);
 
                 // Copy all data into a new table, creating new nodes for all elements
                 for (int i = 0;i < buckets.Length;i++)
@@ -1537,7 +1538,7 @@ namespace Realtime.Messaging.Internal
                     {
                         Node next = current.m_next;
                         int newBucketNo, newLockNo;
-                        GetBucketAndLockNo(current.m_hashcode, out newBucketNo, out newLockNo, newBuckets.Length);
+                        this.GetBucketAndLockNo(current.m_hashcode, out newBucketNo, out newLockNo, newBuckets.Length);
 
                         newBuckets[newBucketNo] = new Node(current.m_key, current.m_value, current.m_hashcode, newBuckets[newBucketNo]);
 
@@ -1551,14 +1552,14 @@ namespace Realtime.Messaging.Internal
                 }
 
                 // And finally adjust m_buckets and m_countPerLock to point to data for the new table
-                m_buckets = newBuckets;
-                m_countPerLock = newCountPerLock;
+                this.m_buckets = newBuckets;
+                this.m_countPerLock = newCountPerLock;
 
             }
             finally
             {
                 // Release all locks that we took earlier 
-                ReleaseLocks(0, locksAcquired);
+                this.ReleaseLocks(0, locksAcquired);
             }
         }
 
@@ -1569,10 +1570,10 @@ namespace Realtime.Messaging.Internal
                 int hashcode, out int bucketNo, out int lockNo, int bucketCount)
         {
             bucketNo = (hashcode & 0x7fffffff) % bucketCount;
-            lockNo = bucketNo % m_locks.Length;
+            lockNo = bucketNo % this.m_locks.Length;
 
-            Assert(bucketNo >= 0 && bucketNo < bucketCount);
-            Assert(lockNo >= 0 && lockNo < m_locks.Length);
+            this.Assert(bucketNo >= 0 && bucketNo < bucketCount);
+            this.Assert(lockNo >= 0 && lockNo < this.m_locks.Length);
         }
 
         /// <summary> 
@@ -1591,8 +1592,8 @@ namespace Realtime.Messaging.Internal
         /// </summary> 
         private void AcquireAllLocks(ref int locksAcquired)
         {
-            AcquireLocks(0, m_locks.Length, ref locksAcquired);
-            Assert(locksAcquired == m_locks.Length);
+            this.AcquireLocks(0, this.m_locks.Length, ref locksAcquired);
+            this.Assert(locksAcquired == this.m_locks.Length);
         }
 
         /// <summary> 
@@ -1602,14 +1603,14 @@ namespace Realtime.Messaging.Internal
         /// </summary> 
         private void AcquireLocks(int fromInclusive, int toExclusive, ref int locksAcquired)
         {
-            Assert(fromInclusive <= toExclusive);
+            this.Assert(fromInclusive <= toExclusive);
 
             for (int i = fromInclusive;i < toExclusive;i++)
             {
                 bool lockTaken = false;
                 try
                 {
-                    Monitor.Enter(m_locks[i]);
+                    Monitor.Enter(this.m_locks[i]);
                     lockTaken = true;
                 }
                 finally
@@ -1627,11 +1628,11 @@ namespace Realtime.Messaging.Internal
         /// </summary> 
         private void ReleaseLocks(int fromInclusive, int toExclusive)
         {
-            Assert(fromInclusive <= toExclusive);
+            this.Assert(fromInclusive <= toExclusive);
 
             for (int i = fromInclusive;i < toExclusive;i++)
             {
-                Monitor.Exit(m_locks[i]);
+                Monitor.Exit(this.m_locks[i]);
             }
         }
 
@@ -1643,12 +1644,12 @@ namespace Realtime.Messaging.Internal
             int locksAcquired = 0;
             try
             {
-                AcquireAllLocks(ref locksAcquired);
+                this.AcquireAllLocks(ref locksAcquired);
                 List<TKey> keys = new List<TKey>();
 
-                for (int i = 0;i < m_buckets.Length;i++)
+                for (int i = 0;i < this.m_buckets.Length;i++)
                 {
-                    Node current = m_buckets[i];
+                    Node current = this.m_buckets[i];
                     while (current != null)
                     {
                         keys.Add(current.m_key);
@@ -1660,7 +1661,7 @@ namespace Realtime.Messaging.Internal
             }
             finally
             {
-                ReleaseLocks(0, locksAcquired);
+                this.ReleaseLocks(0, locksAcquired);
             }
         }
 
@@ -1672,12 +1673,12 @@ namespace Realtime.Messaging.Internal
             int locksAcquired = 0;
             try
             {
-                AcquireAllLocks(ref locksAcquired);
+                this.AcquireAllLocks(ref locksAcquired);
                 List<TValue> values = new List<TValue>();
 
-                for (int i = 0;i < m_buckets.Length;i++)
+                for (int i = 0;i < this.m_buckets.Length;i++)
                 {
-                    Node current = m_buckets[i];
+                    Node current = this.m_buckets[i];
                     while (current != null)
                     {
                         values.Add(current.m_value);
@@ -1689,7 +1690,7 @@ namespace Realtime.Messaging.Internal
             }
             finally
             {
-                ReleaseLocks(0, locksAcquired);
+                this.ReleaseLocks(0, locksAcquired);
             }
         }
 
@@ -1712,7 +1713,7 @@ namespace Realtime.Messaging.Internal
         /// <returns></returns>
         private string GetResource(string key)
         {
-            Assert(key != null);
+            this.Assert(key != null);
 
             return key;
         }
@@ -1734,10 +1735,10 @@ namespace Realtime.Messaging.Internal
 
             internal Node(TKey key, TValue value, int hashcode, Node next)
             {
-                m_key = key;
-                m_value = value;
-                m_next = next;
-                m_hashcode = hashcode;
+                this.m_key = key;
+                this.m_value = value;
+                this.m_next = next;
+                this.m_hashcode = hashcode;
             }
         }
 
@@ -1751,22 +1752,22 @@ namespace Realtime.Messaging.Internal
 
             internal DictionaryEnumerator(ConcurrentDictionary<TKey, TValue> dictionary)
             {
-                m_enumerator = dictionary.GetEnumerator();
+                this.m_enumerator = dictionary.GetEnumerator();
             }
 
             public DictionaryEntry Entry
             {
-                get { return new DictionaryEntry(m_enumerator.Current.Key, m_enumerator.Current.Value); }
+                get { return new DictionaryEntry(this.m_enumerator.Current.Key, this.m_enumerator.Current.Value); }
             }
 
             public object Key
             {
-                get { return m_enumerator.Current.Key; }
+                get { return this.m_enumerator.Current.Key; }
             }
 
             public object Value
             {
-                get { return m_enumerator.Current.Value; }
+                get { return this.m_enumerator.Current.Value; }
             }
 
             public object Current
@@ -1776,12 +1777,12 @@ namespace Realtime.Messaging.Internal
 
             public bool MoveNext()
             {
-                return m_enumerator.MoveNext();
+                return this.m_enumerator.MoveNext();
             }
 
             public void Reset()
             {
-                m_enumerator.Reset();
+                this.m_enumerator.Reset();
             }
         }
 
@@ -1792,9 +1793,9 @@ namespace Realtime.Messaging.Internal
         private void OnSerializing(StreamingContext context)
         {
             // save the data into the serialization array to be saved
-            m_serializationArray = ToArray();
-            m_serializationConcurrencyLevel = m_locks.Length;
-            m_serializationCapacity = m_buckets.Length;
+            this.m_serializationArray = this.ToArray();
+            this.m_serializationConcurrencyLevel = this.m_locks.Length;
+            this.m_serializationCapacity = this.m_buckets.Length;
         }
 
         /// <summary> 
@@ -1803,19 +1804,19 @@ namespace Realtime.Messaging.Internal
         [OnDeserialized]
         private void OnDeserialized(StreamingContext context)
         {
-            KeyValuePair<TKey, TValue>[] array = m_serializationArray;
+            KeyValuePair<TKey, TValue>[] array = this.m_serializationArray;
 
-            m_buckets = new Node[m_serializationCapacity];
-            m_countPerLock = new int[m_serializationConcurrencyLevel];
+            this.m_buckets = new Node[this.m_serializationCapacity];
+            this.m_countPerLock = new int[this.m_serializationConcurrencyLevel];
 
-            m_locks = new object[m_serializationConcurrencyLevel];
-            for (int i = 0;i < m_locks.Length;i++)
+            this.m_locks = new object[this.m_serializationConcurrencyLevel];
+            for (int i = 0;i < this.m_locks.Length;i++)
             {
-                m_locks[i] = new object();
+                this.m_locks[i] = new object();
             }
 
-            InitializeFromCollection(array);
-            m_serializationArray = null;
+            this.InitializeFromCollection(array);
+            this.m_serializationArray = null;
 
         }
     }

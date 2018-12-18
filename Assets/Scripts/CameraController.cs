@@ -30,26 +30,27 @@ public class CameraController : MonoBehaviour
     private Quaternion rotation;
     private Vector3 position;
  
-    void Start() { Init(); }
+    void Start() {
+        this.Init(); }
  
     public void Init()
     {
         GameObject go = new GameObject("Fake Cam Target");
-        go.transform.position = transform.position + (transform.forward * distance);
-        target = go.transform;
- 
-        distance = Vector3.Distance(transform.position, target.position);
-        currentDistance = distance;
-        desiredDistance = distance;
+        go.transform.position = this.transform.position + (this.transform.forward * this.distance);
+        this.target = go.transform;
+
+        this.distance = Vector3.Distance(this.transform.position, this.target.position);
+        this.currentDistance = this.distance;
+        this.desiredDistance = this.distance;
  
         //be sure to grab the current rotations as starting points.
-        position = transform.position;
-        rotation = transform.rotation;
-        currentRotation = transform.rotation;
-        desiredRotation = transform.rotation;
- 
-        xDeg = Vector3.Angle(Vector3.right, transform.right );
-        yDeg = Vector3.Angle(Vector3.up, transform.up );
+        this.position = this.transform.position;
+        this.rotation = this.transform.rotation;
+        this.currentRotation = this.transform.rotation;
+        this.desiredRotation = this.transform.rotation;
+
+        this.xDeg = Vector3.Angle(Vector3.right, this.transform.right );
+        this.yDeg = Vector3.Angle(Vector3.up, this.transform.up );
     }
  
     /*
@@ -60,46 +61,46 @@ public class CameraController : MonoBehaviour
         // If Control and Alt and Middle button? ZOOM!
         if (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftAlt) && Input.GetKey(KeyCode.LeftControl))
         {
-            desiredDistance -= Input.GetAxis("Mouse Y") * Time.deltaTime * zoomRate*0.125f * Mathf.Abs(desiredDistance);
+            this.desiredDistance -= Input.GetAxis("Mouse Y") * Time.deltaTime * this.zoomRate*0.125f * Mathf.Abs(this.desiredDistance);
         }
         // If middle mouse and left alt are selected? ORBIT
         else if (Input.GetMouseButton(0) && Input.GetKey(KeyCode.LeftAlt))
         {
-            xDeg += Input.GetAxis("Mouse X") * xSpeed * 0.02f;
-            yDeg -= Input.GetAxis("Mouse Y") * ySpeed * 0.02f;
+            this.xDeg += Input.GetAxis("Mouse X") * this.xSpeed * 0.02f;
+            this.yDeg -= Input.GetAxis("Mouse Y") * this.ySpeed * 0.02f;
  
             ////////OrbitAngle
  
             //Clamp the vertical axis for the orbit
-            yDeg = ClampAngle(yDeg, yMinLimit, yMaxLimit);
+            this.yDeg = ClampAngle(this.yDeg, this.yMinLimit, this.yMaxLimit);
             // set camera rotation 
-            desiredRotation = Quaternion.Euler(yDeg, xDeg, 0);
-            currentRotation = transform.rotation;
- 
-            rotation = Quaternion.Lerp(currentRotation, desiredRotation, Time.deltaTime * zoomDampening);
-            transform.rotation = rotation;
+            this.desiredRotation = Quaternion.Euler(this.yDeg, this.xDeg, 0);
+            this.currentRotation = this.transform.rotation;
+
+            this.rotation = Quaternion.Lerp(this.currentRotation, this.desiredRotation, Time.deltaTime * this.zoomDampening);
+            this.transform.rotation = this.rotation;
         }
         // left mouse button and Q key, we pan by way of transforming the target in screenspace
         else if (Input.GetMouseButton(0) && Input.GetKey(KeyCode.Q))
         {
             //grab the rotation of the camera so we can move in a psuedo local XY space
-            target.rotation = transform.rotation;
-            target.Translate(Vector3.right * -Input.GetAxis("Mouse X") * panSpeed);
-            target.Translate(transform.up * -Input.GetAxis("Mouse Y") * panSpeed, Space.World);
+            this.target.rotation = this.transform.rotation;
+            this.target.Translate(Vector3.right * -Input.GetAxis("Mouse X") * this.panSpeed);
+            this.target.Translate(this.transform.up * -Input.GetAxis("Mouse Y") * this.panSpeed, Space.World);
         }
  
         ////////Orbit Position
  
         // affect the desired Zoom distance if we roll the scrollwheel
-        desiredDistance -= Input.GetAxis("Mouse ScrollWheel") * Time.deltaTime * zoomRate * Mathf.Abs(desiredDistance);
+        this.desiredDistance -= Input.GetAxis("Mouse ScrollWheel") * Time.deltaTime * this.zoomRate * Mathf.Abs(this.desiredDistance);
         //clamp the zoom min/max
-        desiredDistance = Mathf.Clamp(desiredDistance, minDistance, maxDistance);
+        this.desiredDistance = Mathf.Clamp(this.desiredDistance, this.minDistance, this.maxDistance);
         // For smoothing of the zoom, lerp distance
-        currentDistance = Mathf.Lerp(currentDistance, desiredDistance, Time.deltaTime * zoomDampening);
+        this.currentDistance = Mathf.Lerp(this.currentDistance, this.desiredDistance, Time.deltaTime * this.zoomDampening);
  
         // calculate position based on the new currentDistance 
-        position = target.position - (rotation * Vector3.forward * currentDistance + targetOffset);
-        transform.position = position;
+        this.position = this.target.position - (this.rotation * Vector3.forward * this.currentDistance + this.targetOffset);
+        this.transform.position = this.position;
     }
  
     private static float ClampAngle(float angle, float min, float max)

@@ -54,7 +54,7 @@ public class CoroutineQueue
 		}
 		this.maxActive = maxActive;
 		this.coroutineStarter = coroutineStarter;
-		queue = new Queue<IEnumerator>();
+	    this.queue = new Queue<IEnumerator>();
 	}
  
 	/// <summary>
@@ -64,14 +64,14 @@ public class CoroutineQueue
 	/// <param name="coroutine">Coroutine to run or queue</param>
 	public void Run(IEnumerator coroutine)
 	{
-		if (numActive < maxActive)
+		if (this.numActive < this.maxActive)
 		{
-			var runner = CoroutineRunner(coroutine);
-			coroutineStarter(runner);
+			var runner = this.CoroutineRunner(coroutine);
+		    this.coroutineStarter(runner);
 		}
 		else
 		{
-			queue.Enqueue(coroutine);
+		    this.queue.Enqueue(coroutine);
 		}
 	}
  
@@ -83,16 +83,17 @@ public class CoroutineQueue
 	/// <param name="coroutine">Coroutine to run</param>
 	private IEnumerator CoroutineRunner(IEnumerator coroutine)
 	{
-		numActive++;
+	    this.numActive++;
 		while (coroutine.MoveNext())
 		{
 			yield return coroutine.Current;
 		}
-		numActive--;
-		if (queue.Count > 0)
+
+	    this.numActive--;
+		if (this.queue.Count > 0)
 		{
-			var next = queue.Dequeue();
-			Run(next);
+			var next = this.queue.Dequeue();
+		    this.Run(next);
 		}
 	}
 }

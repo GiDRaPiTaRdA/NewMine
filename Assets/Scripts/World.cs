@@ -13,36 +13,26 @@ public class World : MonoBehaviour {
 	public static int chunkSize = 16;
 	public static int worldSize = 1;
 	public static int radius = 4;
-	public static ConcurrentDictionary<string, Chunk> chunks;
+	public static ConcurrentDictionary<Vector3, Chunk> chunks;
 	public static bool firstbuild = true;
-	public static List<string> toRemove = new List<string>();
+	public static List<Vector3> toRemove = new List<Vector3>();
 
 	CoroutineQueue queue;
 	public static uint maxCoroutines = 2000;
 
 	public Vector3 lastbuildPos;
 
-	public static string BuildChunkName(Vector3 v)
-	{
-		return (int)v.x + "_" + 
-			         (int)v.y + "_" + 
-			         (int)v.z;
-	}
-
 	void BuildChunkAt(int x, int y, int z)
 	{
 		Vector3 chunkPosition = new Vector3(x*chunkSize, 
 											y*chunkSize, 
 											z*chunkSize);
-					
-		string n = BuildChunkName(chunkPosition);
-		Chunk c;
 
-		if(!chunks.TryGetValue(n, out c))
+	    if(!chunks.TryGetValue(chunkPosition, out Chunk c))
 		{
-			c = new Chunk(chunkPosition, textureAtlas);
+			c = new Chunk(chunkPosition, this.textureAtlas);
 			c.chunk.transform.parent = this.transform;
-			chunks.TryAdd(c.chunk.name, c);
+			chunks.TryAdd(c.chunk.transform.position, c);
 		}
 
 	}
@@ -80,7 +70,7 @@ public class World : MonoBehaviour {
 	IEnumerator DrawChunks()
 	{
 
-		foreach(KeyValuePair<string, Chunk> c in chunks)
+		foreach(KeyValuePair<Vector3, Chunk> c in chunks)
 		{
 			if(c.Value.status == Chunk.ChunkStatus.DRAW) 
 			{
@@ -91,7 +81,7 @@ public class World : MonoBehaviour {
             var chPos = c.Value.chunk.transform.position;
 
 			if (c.Value.chunk && c.Value.status == Chunk.ChunkStatus.DONE &&
-                Mathf.Pow(bPos.x - chPos.x, 2) + Mathf.Pow(bPos.y - chPos.y, 2) + Mathf.Pow(bPos.z - chPos.z, 2) > Mathf.Pow((radius + 1) * World.chunkSize, 2))
+                Mathf.Pow(bPos.x - chPos.x, 2) + Mathf.Pow(bPos.y - chPos.y, 2) + Mathf.Pow(bPos.z - chPos.z, 2) > Mathf.Pow((radius + 1) * chunkSize, 2))
                 toRemove.Add(c.Key);
 
 			yield return null;
@@ -102,7 +92,7 @@ public class World : MonoBehaviour {
 	{
 		for(int i = 0; i < toRemove.Count; i++)
 		{
-			string n = toRemove[i];
+			Vector3 n = toRemove[i];
 
 		    toRemove.Remove(n);
 
@@ -118,60 +108,60 @@ public class World : MonoBehaviour {
 
 	public void BuildNearPlayer()
 	{
-		StopCoroutine("BuildRecursiveWorld");
-		queue.Run(BuildRecursiveWorld((int)(player.transform.position.x/chunkSize),
-											(int)(player.transform.position.y/chunkSize),
-											(int)(player.transform.position.z/chunkSize),
+	    this.StopCoroutine("BuildRecursiveWorld");
+	    this.queue.Run(this.BuildRecursiveWorld((int)(this.player.transform.position.x/chunkSize),
+											(int)(this.player.transform.position.y/chunkSize),
+											(int)(this.player.transform.position.z/chunkSize),
 											radius));
 	}
 
 	// Use this for initialization
 	void Start () {
-		Vector3 ppos = player.transform.position;
-		player.transform.position = new Vector3(ppos.x,
+		Vector3 ppos = this.player.transform.position;
+	    this.player.transform.position = new Vector3(ppos.x,
 											Utils.GenerateHeight(ppos.x,ppos.z) + 1,
 											ppos.z);
 
-		lastbuildPos = player.transform.position;
-		player.SetActive(false);
+	    this.lastbuildPos = this.player.transform.position;
+	    this.player.SetActive(false);
 
 		firstbuild = true;
-		chunks = new ConcurrentDictionary<string, Chunk>();
+		chunks = new ConcurrentDictionary<Vector3, Chunk>();
 		this.transform.position = Vector3.zero;
-		this.transform.rotation = Quaternion.identity;	
-		queue = new CoroutineQueue(maxCoroutines, StartCoroutine);
+		this.transform.rotation = Quaternion.identity;
+	    this.queue = new CoroutineQueue(maxCoroutines, this.StartCoroutine);
 		
 		//build starting chunk
-		BuildChunkAt((int)(player.transform.position.x/chunkSize),
-											(int)(player.transform.position.y/chunkSize),
-											(int)(player.transform.position.z/chunkSize));
+	    this.BuildChunkAt((int)(this.player.transform.position.x/chunkSize),
+											(int)(this.player.transform.position.y/chunkSize),
+											(int)(this.player.transform.position.z/chunkSize));
 		//draw it
-		queue.Run(DrawChunks());
+	    this.queue.Run(this.DrawChunks());
 
 		//create a bigger world
-		queue.Run(BuildRecursiveWorld((int)(player.transform.position.x/chunkSize),
-											(int)(player.transform.position.y/chunkSize),
-											(int)(player.transform.position.z/chunkSize),radius));
+	    this.queue.Run(this.BuildRecursiveWorld((int)(this.player.transform.position.x/chunkSize),
+											(int)(this.player.transform.position.y/chunkSize),
+											(int)(this.player.transform.position.z/chunkSize),radius));
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		Vector3 movement = lastbuildPos - player.transform.position;
+		Vector3 movement = this.lastbuildPos - this.player.transform.position;
 
 		if(movement.magnitude > chunkSize )
 		{
-			lastbuildPos = player.transform.position;
-			BuildNearPlayer();
+		    this.lastbuildPos = this.player.transform.position;
+		    this.BuildNearPlayer();
 		}
 
 
-		if(!player.activeSelf)
+		if(!this.player.activeSelf)
 		{
-			player.SetActive(true);	
+		    this.player.SetActive(true);	
 			firstbuild = false;
 		}
 
-		queue.Run(DrawChunks());
-		queue.Run(RemoveOldChunks());
+	    this.queue.Run(this.DrawChunks());
+	    this.queue.Run(this.RemoveOldChunks());
 	}
 }

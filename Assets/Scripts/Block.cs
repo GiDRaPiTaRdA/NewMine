@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+// ReSharper disable InconsistentNaming
 
 public class Block {
 
@@ -9,11 +10,11 @@ public class Block {
 
 	public BlockType bType;
 	public bool isSolid;
-	Chunk owner;
-	GameObject parent;
+    readonly Chunk owner;
+    readonly GameObject parent;
 	Vector3 position;
 
-	Vector2[,] blockUVs = { 
+    readonly Vector2[,] blockUVs = { 
 		/*GRASS TOP*/		{new Vector2( 0.125f, 0.375f ), new Vector2( 0.1875f, 0.375f),
 								new Vector2( 0.125f, 0.4375f ),new Vector2( 0.1875f, 0.4375f )},
 		/*GRASS SIDE*/		{new Vector2( 0.1875f, 0.9375f ), new Vector2( 0.25f, 0.9375f),
@@ -32,42 +33,45 @@ public class Block {
 
 	public Block(BlockType b, Vector3 pos, GameObject p, Chunk o)
 	{
-		bType = b;
-		owner = o;
-		parent = p;
-		position = pos;
-		if(bType == BlockType.AIR)
-			isSolid = false;
+	    this.bType = b;
+	    this.owner = o;
+	    this.parent = p;
+	    this.position = pos;
+
+		if(this.bType == BlockType.AIR)
+		    this.isSolid = false;
 		else
-			isSolid = true;
+		    this.isSolid = true;
 	}
 
 	public Block(BlockType b, Vector3 pos, GameObject p)
 	{
-		bType = b;
-		parent = p;
-		position = pos;
-		if(bType == BlockType.AIR)
-			isSolid = false;
+	    this.bType = b;
+	    this.parent = p;
+	    this.position = pos;
+		if(this.bType == BlockType.AIR)
+		    this.isSolid = false;
 		else
-			isSolid = true;
+		    this.isSolid = true;
 	}
 
 	public void SetType(BlockType b)
 	{
-		bType = b;
-		if(bType == BlockType.AIR)
-			isSolid = false;
+	    this.bType = b;
+		if(this.bType == BlockType.AIR)
+		    this.isSolid = false;
 		else
-			isSolid = true;
+		    this.isSolid = true;
 	}
 
 	void CreateQuad(Cubeside side)
 	{
-		Mesh mesh = new Mesh();
-	    mesh.name = "ScriptedMesh" + side.ToString(); 
+        Mesh mesh = new Mesh
+        {
+            name = "ScriptedMesh" + side
+        };
 
-		Vector3[] vertices = new Vector3[4];
+        Vector3[] vertices = new Vector3[4];
 		Vector3[] normals = new Vector3[4];
 		Vector2[] uvs = new Vector2[4];
 		int[] triangles = new int[6];
@@ -78,26 +82,26 @@ public class Block {
 		Vector2 uv01;
 		Vector2 uv11;
 
-		if(bType == BlockType.GRASS && side == Cubeside.TOP)
+		if(this.bType == BlockType.GRASS && side == Cubeside.TOP)
 		{
-			uv00 = blockUVs[0,0];
-			uv10 = blockUVs[0,1];
-			uv01 = blockUVs[0,2];
-			uv11 = blockUVs[0,3];
+			uv00 = this.blockUVs[0,0];
+			uv10 = this.blockUVs[0,1];
+			uv01 = this.blockUVs[0,2];
+			uv11 = this.blockUVs[0,3];
 		}
-		else if(bType == BlockType.GRASS && side == Cubeside.BOTTOM)
+		else if(this.bType == BlockType.GRASS && side == Cubeside.BOTTOM)
 		{
-			uv00 = blockUVs[(int)(BlockType.DIRT+1),0];
-			uv10 = blockUVs[(int)(BlockType.DIRT+1),1];
-			uv01 = blockUVs[(int)(BlockType.DIRT+1),2];
-			uv11 = blockUVs[(int)(BlockType.DIRT+1),3];
+			uv00 = this.blockUVs[(int)(BlockType.DIRT+1),0];
+			uv10 = this.blockUVs[(int)(BlockType.DIRT+1),1];
+			uv01 = this.blockUVs[(int)(BlockType.DIRT+1),2];
+			uv11 = this.blockUVs[(int)(BlockType.DIRT+1),3];
 		}
 		else
 		{
-			uv00 = blockUVs[(int)(bType+1),0];
-			uv10 = blockUVs[(int)(bType+1),1];
-			uv01 = blockUVs[(int)(bType+1),2];
-			uv11 = blockUVs[(int)(bType+1),3];
+			uv00 = this.blockUVs[(int)(this.bType+1),0];
+			uv10 = this.blockUVs[(int)(this.bType+1),1];
+			uv01 = this.blockUVs[(int)(this.bType+1),2];
+			uv11 = this.blockUVs[(int)(this.bType+1),3];
 		}
 
 		//all possible vertices 
@@ -113,46 +117,46 @@ public class Block {
 		switch(side)
 		{
 			case Cubeside.BOTTOM:
-				vertices = new Vector3[] {p0, p1, p2, p3};
-				normals = new Vector3[] {Vector3.down, Vector3.down, 
+				vertices = new[] {p0, p1, p2, p3};
+				normals = new[] {Vector3.down, Vector3.down, 
 											Vector3.down, Vector3.down};
-				uvs = new Vector2[] {uv11, uv01, uv00, uv10};
-				triangles = new int[] { 3, 1, 0, 3, 2, 1};
+				uvs = new[] {uv11, uv01, uv00, uv10};
+				triangles = new[] { 3, 1, 0, 3, 2, 1};
 			break;
 			case Cubeside.TOP:
-				vertices = new Vector3[] {p7, p6, p5, p4};
-				normals = new Vector3[] {Vector3.up, Vector3.up, 
+				vertices = new[] {p7, p6, p5, p4};
+				normals = new[] {Vector3.up, Vector3.up, 
 											Vector3.up, Vector3.up};
-				uvs = new Vector2[] {uv11, uv01, uv00, uv10};
-				triangles = new int[] {3, 1, 0, 3, 2, 1};
+				uvs = new[] {uv11, uv01, uv00, uv10};
+				triangles = new[] {3, 1, 0, 3, 2, 1};
 			break;
 			case Cubeside.LEFT:
-				vertices = new Vector3[] {p7, p4, p0, p3};
-				normals = new Vector3[] {Vector3.left, Vector3.left, 
+				vertices = new[] {p7, p4, p0, p3};
+				normals = new[] {Vector3.left, Vector3.left, 
 											Vector3.left, Vector3.left};
-				uvs = new Vector2[] {uv11, uv01, uv00, uv10};
-				triangles = new int[] {3, 1, 0, 3, 2, 1};
+				uvs = new[] {uv11, uv01, uv00, uv10};
+				triangles = new[] {3, 1, 0, 3, 2, 1};
 			break;
 			case Cubeside.RIGHT:
-				vertices = new Vector3[] {p5, p6, p2, p1};
-				normals = new Vector3[] {Vector3.right, Vector3.right, 
+				vertices = new[] {p5, p6, p2, p1};
+				normals = new[] {Vector3.right, Vector3.right, 
 											Vector3.right, Vector3.right};
-				uvs = new Vector2[] {uv11, uv01, uv00, uv10};
-				triangles = new int[] {3, 1, 0, 3, 2, 1};
+				uvs = new[] {uv11, uv01, uv00, uv10};
+				triangles = new[] {3, 1, 0, 3, 2, 1};
 			break;
 			case Cubeside.FRONT:
-				vertices = new Vector3[] {p4, p5, p1, p0};
-				normals = new Vector3[] {Vector3.forward, Vector3.forward, 
+				vertices = new[] {p4, p5, p1, p0};
+				normals = new[] {Vector3.forward, Vector3.forward, 
 											Vector3.forward, Vector3.forward};
-				uvs = new Vector2[] {uv11, uv01, uv00, uv10};
-				triangles = new int[] {3, 1, 0, 3, 2, 1};
+				uvs = new[] {uv11, uv01, uv00, uv10};
+				triangles = new[] {3, 1, 0, 3, 2, 1};
 			break;
 			case Cubeside.BACK:
-				vertices = new Vector3[] {p6, p7, p3, p2};
-				normals = new Vector3[] {Vector3.back, Vector3.back, 
+				vertices = new[] {p6, p7, p3, p2};
+				normals = new[] {Vector3.back, Vector3.back, 
 											Vector3.back, Vector3.back};
-				uvs = new Vector2[] {uv11, uv01, uv00, uv10};
-				triangles = new int[] {3, 1, 0, 3, 2, 1};
+				uvs = new[] {uv11, uv01, uv00, uv10};
+				triangles = new[] {3, 1, 0, 3, 2, 1};
 			break;
 		}
 
@@ -164,7 +168,7 @@ public class Block {
 		mesh.RecalculateBounds();
 		
 		GameObject quad = new GameObject("Quad");
-		quad.transform.position = position;
+		quad.transform.position = this.position;
 	    quad.transform.parent = this.parent.transform;
 
      	MeshFilter meshFilter = (MeshFilter) quad.AddComponent(typeof(MeshFilter));
@@ -191,17 +195,15 @@ public class Block {
 		{  //block in a neighbouring chunk
 			
 			Vector3 neighbourChunkPos = this.parent.transform.position + 
-										new Vector3((x - (int)position.x)*World.chunkSize, 
-											(y - (int)position.y)*World.chunkSize, 
-											(z - (int)position.z)*World.chunkSize);
-			string nName = World.BuildChunkName(neighbourChunkPos);
+										new Vector3((x - (int) this.position.x)*World.chunkSize, 
+											(y - (int) this.position.y)*World.chunkSize, 
+											(z - (int) this.position.z)*World.chunkSize);
 
-			x = ConvertBlockIndexToLocal(x);
-			y = ConvertBlockIndexToLocal(y);
-			z = ConvertBlockIndexToLocal(z);
-			
-			Chunk nChunk;
-			if(World.chunks.TryGetValue(nName, out nChunk))
+			x = this.ConvertBlockIndexToLocal(x);
+			y = this.ConvertBlockIndexToLocal(y);
+			z = this.ConvertBlockIndexToLocal(z);
+
+		    if(World.chunks.TryGetValue(neighbourChunkPos, out Chunk nChunk))
 			{
 				chunks = nChunk.chunkData;
 			}
@@ -209,7 +211,7 @@ public class Block {
 				return false;
 		}  //block in this chunk
 		else
-			chunks = owner.chunkData;
+			chunks = this.owner.chunkData;
 		
 		try
 		{
@@ -222,19 +224,13 @@ public class Block {
 
 	public void Draw()
 	{
-		if(bType == BlockType.AIR) return;
+		if(this.bType == BlockType.AIR) return;
 
-		if(!HasSolidNeighbour((int)position.x,(int)position.y,(int)position.z + 1))
-			CreateQuad(Cubeside.FRONT);
-		if(!HasSolidNeighbour((int)position.x,(int)position.y,(int)position.z - 1))
-			CreateQuad(Cubeside.BACK);
-		if(!HasSolidNeighbour((int)position.x,(int)position.y + 1,(int)position.z))
-			CreateQuad(Cubeside.TOP);
-		if(!HasSolidNeighbour((int)position.x,(int)position.y - 1,(int)position.z))
-			CreateQuad(Cubeside.BOTTOM);
-		if(!HasSolidNeighbour((int)position.x - 1,(int)position.y,(int)position.z))
-			CreateQuad(Cubeside.LEFT);
-		if(!HasSolidNeighbour((int)position.x + 1,(int)position.y,(int)position.z))
-			CreateQuad(Cubeside.RIGHT);
+		if(!this.HasSolidNeighbour((int) this.position.x,(int) this.position.y,(int) this.position.z + 1)) this.CreateQuad(Cubeside.FRONT);
+		if(!this.HasSolidNeighbour((int) this.position.x,(int) this.position.y,(int) this.position.z - 1)) this.CreateQuad(Cubeside.BACK);
+		if(!this.HasSolidNeighbour((int) this.position.x,(int) this.position.y + 1,(int) this.position.z)) this.CreateQuad(Cubeside.TOP);
+		if(!this.HasSolidNeighbour((int) this.position.x,(int) this.position.y - 1,(int) this.position.z)) this.CreateQuad(Cubeside.BOTTOM);
+		if(!this.HasSolidNeighbour((int) this.position.x - 1,(int) this.position.y,(int) this.position.z)) this.CreateQuad(Cubeside.LEFT);
+		if(!this.HasSolidNeighbour((int) this.position.x + 1,(int) this.position.y,(int) this.position.z)) this.CreateQuad(Cubeside.RIGHT);
 	}
 }
