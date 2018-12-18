@@ -49,7 +49,7 @@ public class BlockInteraction : MonoBehaviour
                 {
                     //update = hitc.chunkData[x, y, z].HitBlock();
 
-                    Block block = hitc.chunkData[x, y, z];
+                    Block block = World.GetWorldBlock(hitBlock);
 
                     block.SetType(Block.BlockType.AIR);
 
@@ -62,7 +62,7 @@ public class BlockInteraction : MonoBehaviour
                 }
                 else
                 {
-                    Block block = hitc.chunkData[x, y, z];
+                    Block block = World.GetWorldBlock(hitBlock);
                     block.SetType(Block.BlockType.STONE);
 
                     GameObject.DestroyImmediate(hitc.chunk.GetComponent<MeshFilter>());
