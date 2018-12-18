@@ -15,7 +15,7 @@ public class World : MonoBehaviour {
 	public static int radius = 4;
 	public static ConcurrentDictionary<Vector3, Chunk> chunks;
 	public static bool firstbuild = true;
-	public static List<Vector3> toRemove = new List<Vector3>();
+	public static ConcurrentQueue<Vector3> toRemove = new ConcurrentQueue<Vector3>();
 
 	CoroutineQueue queue;
 	public static uint maxCoroutines = 2000;
@@ -24,16 +24,19 @@ public class World : MonoBehaviour {
 
 	void BuildChunkAt(int x, int y, int z)
 	{
-		Vector3 chunkPosition = new Vector3(x*chunkSize, 
-											y*chunkSize, 
-											z*chunkSize);
+	    if (y >= 0)
+	    {
+	        Vector3 chunkPosition = new Vector3(x * chunkSize,
+	            y * chunkSize,
+	            z * chunkSize);
 
-	    if(!chunks.TryGetValue(chunkPosition, out Chunk c))
-		{
-			c = new Chunk(chunkPosition, this.textureAtlas);
-			c.chunk.transform.parent = this.transform;
-			chunks.TryAdd(c.chunk.transform.position, c);
-		}
+	        if (!chunks.TryGetValue(chunkPosition, out Chunk c))
+	        {
+	            c = new Chunk(chunkPosition, this.textureAtlas);
+	            c.chunk.transform.parent = this.transform;
+	            chunks.TryAdd(c.chunk.transform.position, c);
+	        }
+	    }
 
 	}
 
@@ -82,7 +85,7 @@ public class World : MonoBehaviour {
 
 			if (c.Value.chunk && c.Value.status == Chunk.ChunkStatus.DONE &&
                 Mathf.Pow(bPos.x - chPos.x, 2) + Mathf.Pow(bPos.y - chPos.y, 2) + Mathf.Pow(bPos.z - chPos.z, 2) > Mathf.Pow((radius + 1) * chunkSize, 2))
-                toRemove.Add(c.Key);
+                toRemove.Enqueue(c.Key);
 
 			yield return null;
 		}
@@ -92,9 +95,7 @@ public class World : MonoBehaviour {
 	{
 		for(int i = 0; i < toRemove.Count; i++)
 		{
-			Vector3 n = toRemove[i];
-
-		    toRemove.Remove(n);
+		    toRemove.TryDequeue(out Vector3 n);
 
             if (chunks.TryGetValue(n, out Chunk c))
 			{

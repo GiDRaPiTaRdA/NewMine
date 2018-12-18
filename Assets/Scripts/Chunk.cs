@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+// ReSharper disable InconsistentNaming
 
 public class Chunk {
 
@@ -24,7 +25,7 @@ public class Chunk {
 					int worldY = (int)(y + this.chunk.transform.position.y);
 					int worldZ = (int)(z + this.chunk.transform.position.z);
 					int surfaceHeight = Utils.GenerateHeight(worldX,worldZ);
-					
+
 					if(Utils.fBM3D(worldX, worldY, worldZ, 0.1f, 3) < 0.42f)
 					    this.chunkData[x,y,z] = new Block(Block.BlockType.AIR, pos, this.chunk.gameObject, this);
 					else if(worldY == 0)
