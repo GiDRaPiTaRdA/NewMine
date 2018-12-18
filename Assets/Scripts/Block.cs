@@ -5,7 +5,7 @@ using UnityEngine;
 public class Block {
 
 	enum Cubeside {BOTTOM, TOP, LEFT, RIGHT, FRONT, BACK};
-	public enum BlockType {GRASS, DIRT, COBBLESTONE, DIAMOND,STONE,REDSTONE,COAL, IRON,GOLD, BEDROCK,AIR};
+	public enum BlockType {GRASS, DIRT, STONE, BEDROCK, REDSTONE, DIAMOND, AIR};
 
 	public BlockType bType;
 	public bool isSolid;
@@ -13,19 +13,22 @@ public class Block {
 	GameObject parent;
 	Vector3 position;
 
-    readonly Vector2[,] blockUVs = { 
-		/*GRASS TOP*/		{new Vector2( 0.125f, 0.375f ), new Vector2( 0.1875f, 0.375f),new Vector2( 0.125f, 0.4375f ),new Vector2( 0.1875f, 0.4375f )},
-		/*GRASS SIDE*/		{new Vector2( 0.1875f, 0.9375f ), new Vector2( 0.25f, 0.9375f),new Vector2( 0.1875f, 1.0f ),new Vector2( 0.25f, 1.0f )},
-		/*DIRT*/			{new Vector2( 0.125f, 0.9375f ), new Vector2( 0.1875f, 0.9375f),new Vector2( 0.125f, 1.0f ),new Vector2( 0.1875f, 1.0f )},
-		/*COBBLESTONE*/		{new Vector2( 0, 0.875f ), new Vector2( 0.0625f, 0.875f),new Vector2( 0, 0.9375f ),new Vector2( 0.0625f, 0.9375f )},
-		/*DIAMOND*/			{new Vector2( 0.125f, 0.75f ), new Vector2( 0.1875f, 0.75f),new Vector2( 0.125f, 0.8125f ),new Vector2( 0.1875f, 0.8125f )},
-		/*STONE*/			{new Vector2( 0.0625f, 0.9375f ), new Vector2( 0.125f, 0.9375f),new Vector2( 0.0625f, 1f ),new Vector2( 0.125f, 1f)},
-		/*REDSTONE*/		{new Vector2( 0.1875f, 0.75f ), new Vector2( 0.25f, 0.75f),new Vector2( 0.1875f, 0.8125f ),new Vector2( 0.25f, 0.8125f)},
-		/*COAL*/			{new Vector2(0.125f, 0.8125f),new Vector2(0.1875f,0.8125f),new Vector2(0.125f,0.875f),new Vector2(0.1875f,0.875f)},
-		/*IRON*/			{new Vector2(0.0625f, 0.8125f),new Vector2(0.125f,0.8125f),new Vector2(0.0625f,0.875f),new Vector2(0.125f,0.875f)},
-		/*GOLD*/			{new Vector2(0f, 0.8125f),new Vector2(0.0625f,0.8125f),new Vector2(0f,0.875f),new Vector2(0.0625f,0.875f)},
-		/*BEDROCK*/			{new Vector2(0.0625f, 0.875f),new Vector2(0.125f,0.875f),new Vector2(0.0625f,0.9375f),new Vector2(0.125f,0.9375f)},
-							}; 
+	Vector2[,] blockUVs = { 
+		/*GRASS TOP*/		{new Vector2( 0.125f, 0.375f ), new Vector2( 0.1875f, 0.375f),
+								new Vector2( 0.125f, 0.4375f ),new Vector2( 0.1875f, 0.4375f )},
+		/*GRASS SIDE*/		{new Vector2( 0.1875f, 0.9375f ), new Vector2( 0.25f, 0.9375f),
+								new Vector2( 0.1875f, 1.0f ),new Vector2( 0.25f, 1.0f )},
+		/*DIRT*/			{new Vector2( 0.125f, 0.9375f ), new Vector2( 0.1875f, 0.9375f),
+								new Vector2( 0.125f, 1.0f ),new Vector2( 0.1875f, 1.0f )},
+		/*STONE*/			{new Vector2( 0, 0.875f ), new Vector2( 0.0625f, 0.875f),
+								new Vector2( 0, 0.9375f ),new Vector2( 0.0625f, 0.9375f )},
+		/*BEDROCK*/			{new Vector2( 0.3125f, 0.8125f ), new Vector2( 0.375f, 0.8125f),
+								new Vector2( 0.3125f, 0.875f ),new Vector2( 0.375f, 0.875f )},
+		/*REDSTONE*/		{new Vector2( 0.1875f, 0.75f ), new Vector2( 0.25f, 0.75f),
+								new Vector2( 0.1875f, 0.8125f ),new Vector2( 0.25f, 0.8125f )},
+		/*DIAMOND*/			{new Vector2( 0.125f, 0.75f ), new Vector2( 0.1875f, 0.75f),
+								new Vector2( 0.125f, 0.8125f ),new Vector2( 0.1875f, 0.8125f )}
+						}; 
 
 	public Block(BlockType b, Vector3 pos, GameObject p, Chunk o)
 	{
@@ -33,6 +36,26 @@ public class Block {
 		owner = o;
 		parent = p;
 		position = pos;
+		if(bType == BlockType.AIR)
+			isSolid = false;
+		else
+			isSolid = true;
+	}
+
+	public Block(BlockType b, Vector3 pos, GameObject p)
+	{
+		bType = b;
+		parent = p;
+		position = pos;
+		if(bType == BlockType.AIR)
+			isSolid = false;
+		else
+			isSolid = true;
+	}
+
+	public void SetType(BlockType b)
+	{
+		bType = b;
 		if(bType == BlockType.AIR)
 			isSolid = false;
 		else
@@ -143,7 +166,6 @@ public class Block {
 		GameObject quad = new GameObject("Quad");
 		quad.transform.position = position;
 	    quad.transform.parent = this.parent.transform;
-	    //quad.transform.localScale =  new Vector3(1.001f,1.001f,1.001f);
 
      	MeshFilter meshFilter = (MeshFilter) quad.AddComponent(typeof(MeshFilter));
 		meshFilter.mesh = mesh;
@@ -172,13 +194,14 @@ public class Block {
 										new Vector3((x - (int)position.x)*World.chunkSize, 
 											(y - (int)position.y)*World.chunkSize, 
 											(z - (int)position.z)*World.chunkSize);
-		
+			string nName = World.BuildChunkName(neighbourChunkPos);
+
 			x = ConvertBlockIndexToLocal(x);
 			y = ConvertBlockIndexToLocal(y);
 			z = ConvertBlockIndexToLocal(z);
 			
 			Chunk nChunk;
-			if(World.chunks.TryGetValue(neighbourChunkPos, out nChunk))
+			if(World.chunks.TryGetValue(nName, out nChunk))
 			{
 				chunks = nChunk.chunkData;
 			}

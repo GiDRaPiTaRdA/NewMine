@@ -9,25 +9,27 @@ public class Utils {
 	static int octaves = 4;
 	static float persistence = 0.5f;
 
-	public static int GenerateStoneHeight(float x, float z){return GenerateHeight(x,z,10,1.2f,0); }
+	public static int GenerateStoneHeight(float x, float z)
+	{
+		float height = Map(0,maxHeight-5, 0, 1, fBM(x*smooth*2,z*smooth*2,octaves+1,persistence));
+		return (int) height;
+	}
 
-    public static int GenerateDirtHeight(float x, float z){  return GenerateHeight(x, z, 0, 0.7f, 0);}
+	public static int GenerateHeight(float x, float z)
+	{
+		float height = Map(0,maxHeight, 0, 1, fBM(x*smooth,z*smooth,octaves,persistence));
+		return (int) height;
+	}
 
-    public static int GenerateHeight(float x, float z, int heightDelta, float multiple = 1, int octavesAdd = 0)
+    public static float fBM3D(float x, float y, float z, float sm, int oct)
     {
-        float height = Map(0,maxHeight- heightDelta, 0, 1, fBM(x*smooth*multiple,z*smooth*multiple,octaves+octavesAdd,persistence));
-        return (int) height;
-    }
+        float XY = fBM(x*sm,y*sm,oct,0.5f);
+        float YZ = fBM(y*sm,z*sm,oct,0.5f);
+        float XZ = fBM(x*sm,z*sm,oct,0.5f);
 
-    public static float fBM3D(float x, float y, float z, float smooth, int octaves)
-    {
-        float XY = fBM(x*smooth,y*smooth,octaves,0.5f);
-        float YZ = fBM(y*smooth,z*smooth,octaves,0.5f);
-        float XZ = fBM(x*smooth,z*smooth,octaves,0.5f);
-
-        float YX = fBM(y*smooth,x*smooth,octaves,0.5f);
-        float ZY = fBM(z*smooth,y*smooth,octaves,0.5f);
-        float ZX = fBM(z*smooth,x*smooth,octaves,0.5f);
+        float YX = fBM(y*sm,x*sm,oct,0.5f);
+        float ZY = fBM(z*sm,y*sm,oct,0.5f);
+        float ZX = fBM(z*sm,x*sm,oct,0.5f);
 
         return (XY+YZ+XZ+YX+ZY+ZX)/6.0f;
     }
@@ -43,9 +45,10 @@ public class Utils {
         float frequency = 1;
         float amplitude = 1;
         float maxValue = 0;
+        float offset = 32000f;
         for(int i = 0; i < oct ; i++) 
         {
-                total += Mathf.PerlinNoise(x * frequency, z * frequency) * amplitude;
+                total += Mathf.PerlinNoise((x+offset) * frequency, (z+offset) * frequency) * amplitude;
 
                 maxValue += amplitude;
 
