@@ -1,0 +1,1 @@
+﻿public enum BlockType { GRASS, DIRT, STONE, BEDROCK, REDSTONE, DIAMOND, AIR };

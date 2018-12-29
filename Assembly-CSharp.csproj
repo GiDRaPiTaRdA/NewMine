@@ -53,15 +53,25 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\ChunkData.cs" />
      <Compile Include="Assets\Scripts\Block.cs" />
      <Compile Include="Assets\Scripts\BlockData.cs" />
      <Compile Include="Assets\Scripts\BlockInteraction.cs" />
+     <Compile Include="Assets\Scripts\BlockQuad.cs" />
+     <Compile Include="Assets\Scripts\BlockType.cs" />
      <Compile Include="Assets\Scripts\CameraController.cs" />
      <Compile Include="Assets\Scripts\Chunk.cs" />
      <Compile Include="Assets\Scripts\ConcurrentDictionary.cs" />
      <Compile Include="Assets\Scripts\CoroutineQueue.cs" />
      <Compile Include="Assets\Scripts\CreateQuads.cs" />
+     <Compile Include="Assets\Scripts\Cubeside.cs" />
      <Compile Include="Assets\Scripts\DisplayFPS.cs" />
+     <Compile Include="Assets\Scripts\DynamicWorld.cs" />
+     <Compile Include="Assets\Scripts\FallFix.cs" />
+     <Compile Include="Assets\Scripts\FPSMonitoring.cs" />
+     <Compile Include="Assets\Scripts\GameManager.cs" />
+     <Compile Include="Assets\Scripts\Position.cs" />
+     <Compile Include="Assets\Scripts\StaticWorld.cs" />
      <Compile Include="Assets\Scripts\Utils.cs" />
      <Compile Include="Assets\Scripts\World.cs" />
  <Reference Include="Unity.TextMeshPro.Editor">
