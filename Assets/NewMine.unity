@@ -329,6 +329,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d87ecc31a0708d46819a2bb2303955f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  height: 50
 --- !u!1 &258121109
 GameObject:
   m_ObjectHideFlags: 0
@@ -633,8 +634,8 @@ Light:
   m_Enabled: 1
   serializedVersion: 8
   m_Type: 1
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 1
+  m_Color: {r: 1, g: 0.9137255, b: 0.6745098, a: 1}
+  m_Intensity: 0.9
   m_Range: 10
   m_SpotAngle: 30
   m_CookieSize: 10
@@ -644,7 +645,7 @@ Light:
     m_CustomResolution: -1
     m_Strength: 1
     m_Bias: 0.05
-    m_NormalBias: 0.07
+    m_NormalBias: 0.01
     m_NearPlane: 0.2
   m_Cookie: {fileID: 0}
   m_DrawHalo: 0
@@ -903,6 +904,10 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2000000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
+      propertyPath: m_HDR
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 5e9e851c0e142814dac026a256ba2ac0, type: 3}
 --- !u!1 &1035443149
@@ -1151,6 +1156,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1127004025}
   - component: {fileID: 1127004024}
+  - component: {fileID: 1127004026}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -1184,6 +1190,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 8
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1127004026
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1127004023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7aac70d2033a5fb4cb5c63e06c95a5b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1248304051
 GameObject:
   m_ObjectHideFlags: 0
@@ -1310,6 +1328,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   textureAtlas: {fileID: 2100000, guid: e5714431ccea91e42a8ad86332cdc1ca, type: 2}
+  textureAtlas2: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   worldSize: 4
 --- !u!1 &1726755055
 GameObject:
@@ -1470,3 +1489,22 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 989999206}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1973032935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1973032930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 860e82cd7a6bb4a29a4b7add4ec78d10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _shutterAngle: 310
+  _sampleCount: 8
+  _frameBlending: 0
+  _reconstructionShader: {fileID: 4800000, guid: 60701d53f4c638048b5e49c197d08b77,
+    type: 3}
+  _frameBlendingShader: {fileID: 4800000, guid: 95caa7c3844725840aec8dad64ac258e,
+    type: 3}

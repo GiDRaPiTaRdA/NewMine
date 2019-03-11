@@ -84,6 +84,7 @@ namespace Assets.Scripts
             this.QuadGameObject = new GameObject("Quad");
             this.QuadGameObject.transform.position = this.Position;
             this.QuadGameObject.transform.parent = this.ParrentTransform;
+            this.QuadGameObject.transform.localScale *= 1f;
 
             this.MeshFilter = (MeshFilter)this.QuadGameObject.AddComponent(typeof(MeshFilter));
             this.MeshFilter.mesh = mesh;
@@ -127,7 +128,8 @@ namespace Assets.Scripts
             mesh.vertices = ((dynamic)dictionary[side]).vertices;
             mesh.normals = ((dynamic)dictionary[side]).normals;
             mesh.uv = new[] { uv11, uv01, uv00, uv10 };
-            mesh.triangles = new[] { 3, 1, 0, 3, 2, 1 };
+            mesh.triangles = new[] {3, 1, 0, 3, 2, 1};
+            //mesh.SetTriangles(new[] { 3, 1, 0, 3, 2, 1 },1);
 
             mesh.RecalculateBounds();
 

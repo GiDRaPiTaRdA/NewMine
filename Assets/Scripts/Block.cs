@@ -20,8 +20,8 @@ namespace Assets.Scripts
         {
             /*GRASS TOP*/
             {
-                new Vector2(0.125f, 0.375f), new Vector2(0.1875f, 0.375f),
-                new Vector2(0.125f, 0.4375f), new Vector2(0.1875f, 0.4375f)
+                new Vector2(0.5f, 0.8125f),new Vector2(0.5625f,0.8125f),
+                new Vector2(0.5f,0.875f),new Vector2(0.5625f,0.875f)
             },
             /*GRASS SIDE*/
             {

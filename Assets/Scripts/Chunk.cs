@@ -15,8 +15,8 @@ using Object = UnityEngine.Object;
 
 public class Chunk
 {
-
     public Material cubeMaterial;
+    public Material cubeMaterial1;
     public ChunkData chunkData;
     public GameObject chunk;
     public Vector3 Position { get; set; }
@@ -130,11 +130,12 @@ public class Chunk
     }
 
     // Use this for initialization
-    public Chunk(Vector3 position, Material c)
+    public Chunk(Vector3 position, Material c,Material c1)
     {
         this.chunk = new GameObject(position.ToString());
         this.chunk.transform.position = position;
         this.cubeMaterial = c;
+        this.cubeMaterial1 = c1;
         this.Position = position;
         this.MeshFilters = new List<MeshFilter>();
         this.BuildChunk();
@@ -158,13 +159,12 @@ public class Chunk
         //2. Create a new mesh on the parent object
         MeshFilter mf = (MeshFilter)this.chunk.gameObject.AddComponent(typeof(MeshFilter));
         mf.mesh = new Mesh();
-
         //3. Add combined meshes on children as the parent's mesh
         mf.mesh.CombineMeshes(combine);
 
         //4. Create a renderer for the parent
         MeshRenderer renderer = this.chunk.gameObject.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
-        renderer.material = this.cubeMaterial;
+        renderer.materials = new Material[]{ this.cubeMaterial,this.cubeMaterial1};
 
         ////5. Delete all uncombined children
         foreach (Transform quad in this.chunk.transform)

@@ -12,6 +12,7 @@ namespace Assets.Scripts
     public class StaticWorld : MonoBehaviour
     {
         public Material textureAtlas;
+        public Material textureAtlas2;
         public static int columnHeight = 4;
         public int worldSize = 1;
         public static Dictionary<Vector3, Chunk> chunks;
@@ -20,6 +21,7 @@ namespace Assets.Scripts
         public StaticWorld()
         {
             StaticWorld.Instance = this;
+         
         }
 
         IEnumerator BuildWorld()
@@ -31,7 +33,7 @@ namespace Assets.Scripts
                     for (int y = columnHeight; y >= 0; y--)
                     {
                         Vector3 chunkPosition = new Vector3(x * World.chunkSize, y * World.chunkSize, z * World.chunkSize);
-                        Chunk c = new Chunk(chunkPosition, this.textureAtlas);
+                        Chunk c = new Chunk(chunkPosition, this.textureAtlas,this.textureAtlas2);
                         c.chunk.transform.parent = this.transform;
                         chunks.Add(c.chunk.transform.position, c);
                     }
@@ -53,6 +55,9 @@ namespace Assets.Scripts
             this.transform.position = Vector3.zero;
             this.transform.rotation = Quaternion.identity;
             this.StartCoroutine(this.BuildWorld());
+
+           // this.textureAtlas.mainTexture.
+            this.textureAtlas.mainTexture.mipMapBias = +0;
         }
 
         public static Block GetWorldBlock(Vector3 pos)

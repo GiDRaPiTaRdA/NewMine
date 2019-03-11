@@ -54,6 +54,9 @@
   </ItemGroup>
   <ItemGroup>
      <Compile Include="Assets\ChunkData.cs" />
+     <Compile Include="Assets\Kino\Motion\Motion.cs" />
+     <Compile Include="Assets\Kino\Motion\Script\FrameBlendingFilter.cs" />
+     <Compile Include="Assets\Kino\Motion\Script\ReconstructionFilter.cs" />
      <Compile Include="Assets\Scripts\Block.cs" />
      <Compile Include="Assets\Scripts\BlockData.cs" />
      <Compile Include="Assets\Scripts\BlockInteraction.cs" />
@@ -61,6 +64,8 @@
      <Compile Include="Assets\Scripts\BlockType.cs" />
      <Compile Include="Assets\Scripts\CameraController.cs" />
      <Compile Include="Assets\Scripts\Chunk.cs" />
+     <Compile Include="Assets\Scripts\CloseApplication.cs" />
+     <Compile Include="Assets\Scripts\CombineBehaviour.cs" />
      <Compile Include="Assets\Scripts\ConcurrentDictionary.cs" />
      <Compile Include="Assets\Scripts\CoroutineQueue.cs" />
      <Compile Include="Assets\Scripts\CreateQuads.cs" />
@@ -74,6 +79,11 @@
      <Compile Include="Assets\Scripts\StaticWorld.cs" />
      <Compile Include="Assets\Scripts\Utils.cs" />
      <Compile Include="Assets\Scripts\World.cs" />
+     <None Include="Assets\Kino\Motion\Shader\Prefilter.cginc" />
+     <None Include="Assets\Kino\Motion\Shader\Reconstruction.shader" />
+     <None Include="Assets\Kino\Motion\Shader\Reconstruction.cginc" />
+     <None Include="Assets\Kino\Motion\Shader\FrameBlending.shader" />
+     <None Include="Assets\Kino\Motion\Shader\Common.cginc" />
  <Reference Include="Unity.TextMeshPro.Editor">
  <HintPath>C:/Users/Maxim/source/repos/NewMineDynamic/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
