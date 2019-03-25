@@ -87,6 +87,7 @@ namespace Assets.Scripts
             this.QuadGameObject.transform.localScale *= 1f;
 
             this.MeshFilter = (MeshFilter)this.QuadGameObject.AddComponent(typeof(MeshFilter));
+            this.MeshFilter.tag = blockType.ToString();
             this.MeshFilter.mesh = mesh;
         }
 
@@ -98,32 +99,36 @@ namespace Assets.Scripts
             };
 
             //all possible UVs
-            Vector2 uv00;
-            Vector2 uv10;
-            Vector2 uv01;
-            Vector2 uv11;
+            Vector2 uv00 = new Vector2(0,0);
+            Vector2 uv10 = new Vector2(1,0);
+            Vector2 uv01 =new Vector2(0,1);
+            Vector2 uv11 = new Vector2(1,1);
 
-            if (this.BlockType == BlockType.GRASS && side == Cubeside.TOP)
-            {
-                uv00 = Block.blockUVs[0, 0];
-                uv10 = Block.blockUVs[0, 1];
-                uv01 = Block.blockUVs[0, 2];
-                uv11 = Block.blockUVs[0, 3];
-            }
-            else if (this.BlockType == BlockType.GRASS && side == Cubeside.BOTTOM)
-            {
-                uv00 = Block.blockUVs[(int)(BlockType.DIRT + 1), 0];
-                uv10 = Block.blockUVs[(int)(BlockType.DIRT + 1), 1];
-                uv01 = Block.blockUVs[(int)(BlockType.DIRT + 1), 2];
-                uv11 = Block.blockUVs[(int)(BlockType.DIRT + 1), 3];
-            }
-            else
-            {
-                uv00 = Block.blockUVs[(int)(this.BlockType + 1), 0];
-                uv10 = Block.blockUVs[(int)(this.BlockType + 1), 1];
-                uv01 = Block.blockUVs[(int)(this.BlockType + 1), 2];
-                uv11 = Block.blockUVs[(int)(this.BlockType + 1), 3];
-            }
+            //if (this.BlockType == BlockType.GRASS && side == Cubeside.TOP)
+            //{
+            //    uv00 = Block.blockUVs[0, 0];
+            //    uv10 = Block.blockUVs[0, 1];
+            //    uv01 = Block.blockUVs[0, 2];
+            //    uv11 = Block.blockUVs[0, 3];
+            //}
+            //else if (this.BlockType == BlockType.GRASS && side == Cubeside.BOTTOM)
+            //{
+            //    uv00 = Block.blockUVs[(int)(BlockType.DIRT + 1), 0];
+            //    uv10 = Block.blockUVs[(int)(BlockType.DIRT + 1), 1];
+            //    uv01 = Block.blockUVs[(int)(BlockType.DIRT + 1), 2];
+            //    uv11 = Block.blockUVs[(int)(BlockType.DIRT + 1), 3];
+            //}
+            //else
+            //{
+            //    uv00 = Block.blockUVs[(int)(this.BlockType + 1), 0];
+            //    uv10 = Block.blockUVs[(int)(this.BlockType + 1), 1];
+            //    uv01 = Block.blockUVs[(int)(this.BlockType + 1), 2];
+            //    uv11 = Block.blockUVs[(int)(this.BlockType + 1), 3];
+            //}
+
+
+
+
 
             mesh.vertices = ((dynamic)dictionary[side]).vertices;
             mesh.normals = ((dynamic)dictionary[side]).normals;

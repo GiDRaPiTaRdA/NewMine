@@ -58,6 +58,7 @@
      <Compile Include="Assets\Kino\Motion\Script\FrameBlendingFilter.cs" />
      <Compile Include="Assets\Kino\Motion\Script\ReconstructionFilter.cs" />
      <Compile Include="Assets\Scripts\Block.cs" />
+     <Compile Include="Assets\Scripts\BlockBuilder.cs" />
      <Compile Include="Assets\Scripts\BlockData.cs" />
      <Compile Include="Assets\Scripts\BlockInteraction.cs" />
      <Compile Include="Assets\Scripts\BlockQuad.cs" />
@@ -65,7 +66,6 @@
      <Compile Include="Assets\Scripts\CameraController.cs" />
      <Compile Include="Assets\Scripts\Chunk.cs" />
      <Compile Include="Assets\Scripts\CloseApplication.cs" />
-     <Compile Include="Assets\Scripts\CombineBehaviour.cs" />
      <Compile Include="Assets\Scripts\ConcurrentDictionary.cs" />
      <Compile Include="Assets\Scripts\CoroutineQueue.cs" />
      <Compile Include="Assets\Scripts\CreateQuads.cs" />
@@ -75,8 +75,11 @@
      <Compile Include="Assets\Scripts\FallFix.cs" />
      <Compile Include="Assets\Scripts\FPSMonitoring.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
+     <Compile Include="Assets\Scripts\GrassBlock.cs" />
+     <Compile Include="Assets\Scripts\MeshFilterMine.cs" />
      <Compile Include="Assets\Scripts\Position.cs" />
      <Compile Include="Assets\Scripts\StaticWorld.cs" />
+     <Compile Include="Assets\Scripts\StoneBlock.cs" />
      <Compile Include="Assets\Scripts\Utils.cs" />
      <Compile Include="Assets\Scripts\World.cs" />
      <None Include="Assets\Kino\Motion\Shader\Prefilter.cginc" />

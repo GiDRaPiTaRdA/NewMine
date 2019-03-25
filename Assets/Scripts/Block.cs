@@ -16,6 +16,8 @@ namespace Assets.Scripts
 
         public List<BlockQuad> MeshFilters { get; private set; }
 
+
+
         public static readonly Vector2[,] blockUVs =
         {
             /*GRASS TOP*/

@@ -13,8 +13,24 @@ public class BlockInteraction : MonoBehaviour
     {
         this.MouseInputs();
 
+        if (Input.GetKeyDown(KeyCode.Alpha1))
+        {
+            block = BlockType.GRASS;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            block = BlockType.DIRT;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha3))
+        {
+            block = BlockType.STONE; 
+        }
         //this.Input1();
     }
+
+    private BlockType block = BlockType.DIRT;
 
     private void MouseInputs()
     {
@@ -43,6 +59,7 @@ public class BlockInteraction : MonoBehaviour
                     StaticWorld.Instance.StartCoroutine(hitc.RemoveBlock(hitBlock));
 
 
+
                 }
                 else
                 {
@@ -53,7 +70,7 @@ public class BlockInteraction : MonoBehaviour
                         (int)(Mathf.Round(hitPos.y) - hit.collider.gameObject.transform.position.y),
                         (int)(Mathf.Round(hitPos.z) - hit.collider.gameObject.transform.position.z));
 
-                    StaticWorld.Instance.StartCoroutine(hitc.AddBlock(hitBlock));
+                    StaticWorld.Instance.StartCoroutine(hitc.AddBlock(hitBlock,this.block));
                 }
 
             }

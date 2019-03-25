@@ -15,15 +15,14 @@ using Object = UnityEngine.Object;
 
 public class Chunk
 {
-    public Material cubeMaterial;
-    public Material cubeMaterial1;
+    public Material[] materials;
     public ChunkData chunkData;
     public GameObject chunk;
     public Vector3 Position { get; set; }
 
     public List<MeshFilter> MeshFilters { get; set; }
 
-   
+
 
     BlockData bd;
 
@@ -93,7 +92,7 @@ public class Chunk
                     //int surfaceHeight = StaticWorld.columnHeight * World.chunkSize;
 
                     if (worldY == 0)
-                        this.chunkData[x, y, z] = new Block(BlockType.BEDROCK, pos, this.chunk.gameObject, this);
+                        this.chunkData[x, y, z] = new Block(BlockType.DIRT, pos, this.chunk.gameObject, this);
                     else if (Utils.fBM3D(worldX, worldY, worldZ, 0.1f, 3) < 0.42f)
                         this.chunkData[x, y, z] = new Block(BlockType.AIR, pos, this.chunk.gameObject, this);
 
@@ -125,46 +124,37 @@ public class Chunk
                 }
 
         this.CombineQuads();
-        MeshCollider collider = this.chunk.gameObject.AddComponent(typeof(MeshCollider)) as MeshCollider;
+
+        // Update collider
+        MeshCollider collider = this.chunk.gameObject.AddComponent<MeshCollider>();
         collider.sharedMesh = this.chunk.transform.GetComponent<MeshFilter>().mesh;
     }
 
     // Use this for initialization
-    public Chunk(Vector3 position, Material c,Material c1)
+    public Chunk(Vector3 position, Material[] materials)
     {
         this.chunk = new GameObject(position.ToString());
         this.chunk.transform.position = position;
-        this.cubeMaterial = c;
-        this.cubeMaterial1 = c1;
+        this.materials = materials;
         this.Position = position;
         this.MeshFilters = new List<MeshFilter>();
         this.BuildChunk();
     }
-
 
     public void CombineQuads()
     {
         //1. Combine all children meshes
         MeshFilter[] meshFilters = this.chunk.GetComponentsInChildren<MeshFilter>();
 
-        CombineInstance[] combine = new CombineInstance[meshFilters.Length];
-        int i = 0;
-        while (i < meshFilters.Length)
-        {
-            combine[i].mesh = meshFilters[i].sharedMesh;
-            combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
-            i++;
-        }
+        Mesh mesh = this.ReMeshBase(meshFilters, out Material[] issuedMaterials);
 
         //2. Create a new mesh on the parent object
         MeshFilter mf = (MeshFilter)this.chunk.gameObject.AddComponent(typeof(MeshFilter));
-        mf.mesh = new Mesh();
-        //3. Add combined meshes on children as the parent's mesh
-        mf.mesh.CombineMeshes(combine);
+        mf.mesh = mesh;
 
         //4. Create a renderer for the parent
-        MeshRenderer renderer = this.chunk.gameObject.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
-        renderer.materials = new Material[]{ this.cubeMaterial,this.cubeMaterial1};
+        MeshRenderer renderer = this.chunk.gameObject.AddComponent<MeshRenderer>();
+        renderer.materials = issuedMaterials;
 
         ////5. Delete all uncombined children
         foreach (Transform quad in this.chunk.transform)
@@ -174,6 +164,74 @@ public class Chunk
 
     }
 
+    public Mesh ReMeshBase(MeshFilter[] meshFilters, out Material[] issuedMaterials)
+    {
+        // TODO materials by name
+        Dictionary<string,List<CombineInstance>> combineinstanceNew = new Dictionary<string, List<CombineInstance>>();
+
+        List<CombineInstance>[] combinesLists = new List<CombineInstance>[this.materials.Length];
+        for (int j = 0; j < this.materials.Length; j++)
+        {
+            combinesLists[j] = new List<CombineInstance>();
+        }
+
+        int i = 0;
+        while (i < meshFilters.Length)
+        {
+            CombineInstance instance = default;
+
+            var meshf = meshFilters[i];
+
+            instance.mesh = meshf.sharedMesh;
+            instance.transform = meshf.transform.localToWorldMatrix;
+
+            BlockType blockType = (BlockType)Enum.Parse(typeof(BlockType), meshf.tag);
+
+
+
+            combinesLists[(int)blockType].Add(instance);
+
+            i++;
+        }
+
+        List<Mesh> meshes = new List<Mesh>();
+
+        List<Material> mat = new List<Material>();
+
+        for (int j = 0; j < this.materials.Length; j++)
+        {
+            if (combinesLists[j].Any())
+            {
+                Mesh mesh = new Mesh();
+                mat.Add(this.materials[j]);
+                mesh.CombineMeshes(combinesLists[j].ToArray(), true, true);
+                meshes.Add(mesh);
+            }
+        }
+
+        issuedMaterials = mat.ToArray();
+
+        return Combine(meshes.ToArray());
+    }
+
+    private static Mesh Combine(Mesh[] meshes)
+    {
+        CombineInstance[] combineInstances = new CombineInstance[meshes.Length];
+
+        for (int index = 0; index < meshes.Length; index++)
+        {
+            combineInstances[index] = new CombineInstance
+            {
+                subMeshIndex = 0,
+                mesh = meshes[index]
+            };
+        }
+
+        Mesh mainMesh = new Mesh();
+        mainMesh.CombineMeshes(combineInstances, false, false);
+
+        return mainMesh;
+    }
     public IEnumerator RemoveBlock(Vector3 position)
     {
         Stopwatch s = Stopwatch.StartNew();
@@ -195,7 +253,7 @@ public class Chunk
         };
         foreach (Vector3 vector3 in dVectors)
         {
-            Vector3 globalPos = vector3 + position+this.Position;
+            Vector3 globalPos = vector3 + position + this.Position;
 
             if (this.IsInChunk(globalPos))
             {
@@ -226,13 +284,13 @@ public class Chunk
         yield return null;
     }
 
-    public IEnumerator AddBlock(Vector3 position)
+    public IEnumerator AddBlock(Vector3 position, BlockType blockType)
     {
         Stopwatch s = Stopwatch.StartNew();
 
         Block addBlock = StaticWorld.GetWorldBlock(position + this.Position);
 
-        addBlock.SetType(BlockType.STONE);
+        addBlock.SetType(blockType);
 
         addBlock.Draw();
 
@@ -288,68 +346,53 @@ public class Chunk
                vector.z <= World.chunkSize - 1 + this.Position.z;
     }
 
-    public void ReMeshFilter(List<MeshFilter> meshFilters)
+    public void ReMeshFilter(List<MeshFilter> meshFilters = null)
     {
-
-        CombineInstance[] combine = new CombineInstance[meshFilters.Count];
-        int i = 0;
-        while (i < meshFilters.Count)
+        if (meshFilters == null)
         {
-            combine[i].mesh = meshFilters[i].sharedMesh;
-            combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
-            i++;
+            meshFilters = this.MeshFilters;
         }
 
+        Mesh mesh = this.ReMeshBase(meshFilters.ToArray(), out Material[] issuedMaterials);
 
-        Object.DestroyImmediate(this.chunk.GetComponent<MeshFilter>());
-        MeshFilter mf = (MeshFilter)this.chunk.gameObject.AddComponent(typeof(MeshFilter));
-        mf.mesh = new Mesh();
-        mf.mesh.CombineMeshes(combine);
+        this.chunk.gameObject.GetComponent<MeshRenderer>().materials = issuedMaterials;
 
+        this.chunk.gameObject.GetComponent<MeshFilter>().mesh = mesh;
 
-        //Object.DestroyImmediate(this.chunk.GetComponent<MeshRenderer>());
-        //MeshRenderer renderer = this.chunk.gameObject.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
-        //renderer.material = this.cubeMaterial;
-
-
-        //Object.DestroyImmediate(this.chunk.GetComponent<MeshCollider>());
-        //MeshCollider collider = this.chunk.gameObject.AddComponent(typeof(MeshCollider)) as MeshCollider;
-        this.chunk.GetComponent<MeshCollider>().sharedMesh = mf.mesh;
-
-
+        this.chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
-    public void ReMeshFilter()
-    {
-        List<MeshFilter> meshFilters = this.MeshFilters;
+    //public void ReMeshFilter()
+    //{
+    //    List<MeshFilter> meshFilters = this.MeshFilters;
 
-        CombineInstance[] combine = new CombineInstance[meshFilters.Count];
-        int i = 0;
-        while (i < meshFilters.Count)
-        {
-            combine[i].mesh = meshFilters[i].sharedMesh;
-            combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
-            i++;
-        }
-
-
-        Object.DestroyImmediate(this.chunk.GetComponent<MeshFilter>());
-        MeshFilter mf = (MeshFilter)this.chunk.gameObject.AddComponent(typeof(MeshFilter));
-        mf.mesh = new Mesh();
-        mf.mesh.CombineMeshes(combine);
+    //    CombineInstance[] combine = new CombineInstance[meshFilters.Count];
+    //    int i = 0;
+    //    while (i < meshFilters.Count)
+    //    {
+    //        combine[i].mesh = meshFilters[i].sharedMesh;
+    //        combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
+    //        i++;
+    //    }
 
 
-        //Object.DestroyImmediate(this.chunk.GetComponent<MeshRenderer>());
-        //MeshRenderer renderer = this.chunk.gameObject.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
-        //renderer.material = this.cubeMaterial;
+    //    Object.DestroyImmediate(this.chunk.GetComponent<MeshFilter>());
+    //    MeshFilter mf = (MeshFilter)this.chunk.gameObject.AddComponent(typeof(MeshFilter));
+    //    mf.mesh = new Mesh();
+    //    mf.mesh.CombineMeshes(combine);
 
 
-        //Object.DestroyImmediate(this.chunk.GetComponent<MeshCollider>());
-        //MeshCollider collider = this.chunk.gameObject.AddComponent(typeof(MeshCollider)) as MeshCollider;
-        this.chunk.GetComponent<MeshCollider>().sharedMesh = mf.mesh;
+    //    //Object.DestroyImmediate(this.chunk.GetComponent<MeshRenderer>());
+    //    //MeshRenderer renderer = this.chunk.gameObject.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
+    //    //renderer.material = this.cubeMaterial;
 
 
-    }
+    //    //Object.DestroyImmediate(this.chunk.GetComponent<MeshCollider>());
+    //    //MeshCollider collider = this.chunk.gameObject.AddComponent(typeof(MeshCollider)) as MeshCollider;
+    //    this.chunk.GetComponent<MeshCollider>().sharedMesh = mf.mesh;
+
+
+    //}
 
     public void ReDrawChunk()
     {
