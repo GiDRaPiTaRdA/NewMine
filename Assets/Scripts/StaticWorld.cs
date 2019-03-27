@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
@@ -11,7 +12,15 @@ namespace Assets.Scripts
 {
     public class StaticWorld : MonoBehaviour
     {
-        public Material[] materials;
+        public GameObject[] cubes;
+
+        private Dictionary<BlockType, CubeDescription> cubeDescriptions;
+
+        public Dictionary<BlockType, CubeDescription> CubeDescriptions => this.cubeDescriptions ??
+                                                     (this.cubeDescriptions = this.cubes
+                                                         .Select(c => c.GetComponent<CubeDescription>()).ToDictionary(d => d.blockType,d=>d));
+
+
 
         public static int columnHeight = 4;
         public int worldSize = 1;
@@ -32,7 +41,7 @@ namespace Assets.Scripts
                     for (int y = columnHeight; y >= 0; y--)
                     {
                         Vector3 chunkPosition = new Vector3(x * World.chunkSize, y * World.chunkSize, z * World.chunkSize);
-                        Chunk c = new Chunk(chunkPosition, this.materials);
+                        Chunk c = new Chunk(chunkPosition);
                         c.chunk.transform.parent = this.transform;
                         chunks.Add(c.chunk.transform.position, c);
                     }

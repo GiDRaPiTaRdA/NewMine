@@ -69,6 +69,7 @@
      <Compile Include="Assets\Scripts\ConcurrentDictionary.cs" />
      <Compile Include="Assets\Scripts\CoroutineQueue.cs" />
      <Compile Include="Assets\Scripts\CreateQuads.cs" />
+     <Compile Include="Assets\Scripts\CubeDescription.cs" />
      <Compile Include="Assets\Scripts\Cubeside.cs" />
      <Compile Include="Assets\Scripts\DisplayFPS.cs" />
      <Compile Include="Assets\Scripts\DynamicWorld.cs" />
@@ -76,6 +77,7 @@
      <Compile Include="Assets\Scripts\FPSMonitoring.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\GrassBlock.cs" />
+     <Compile Include="Assets\Scripts\MeshCombines.cs" />
      <Compile Include="Assets\Scripts\MeshFilterMine.cs" />
      <Compile Include="Assets\Scripts\Position.cs" />
      <Compile Include="Assets\Scripts\StaticWorld.cs" />

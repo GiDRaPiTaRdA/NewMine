@@ -1,4 +1,4 @@
 ﻿
 // ReSharper disable InconsistentNaming
 
-public enum Cubeside { BOTTOM, TOP, LEFT, RIGHT, FRONT, BACK };
+public enum Cubeside { TOP, BOTTOM, LEFT, RIGHT, FRONT, BACK };
