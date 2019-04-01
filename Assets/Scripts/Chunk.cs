@@ -144,8 +144,6 @@ public class Chunk
     public void CombineQuads()
     {
         //1. Combine all children meshes
-        //MeshFilter[] meshFilters = this.MeshFilters.ToArray();// this.chunk.GetComponentsInChildren<MeshFilter>();
-
         Mesh mesh = this.ReMeshBase(this.MeshFiltersBlock.ToArray(), out Material[] issuedMaterials);
 
         //2. Create a new mesh on the parent object
@@ -166,119 +164,59 @@ public class Chunk
 
     public Mesh ReMeshBase(BlockQuad[] blockQuads, out Material[] issuedMaterials)
     {
+        // MaterilaName/ Array of material corresponding meshFilters
         Dictionary<string, MeshCombines> combineinstanceNew = new Dictionary<string, MeshCombines>();
 
-        int i = 0;
-        while (i < blockQuads.Length)
+        // Enumerate Block Quads to fill combine meshes
         {
-
-
-            var meshf = blockQuads[i];
-
-            CombineInstance instance = default;
-
-            instance.mesh = meshf.MeshFilter.sharedMesh;
-            instance.transform = meshf.MeshFilter.transform.localToWorldMatrix;
-
-
-            CubeDescription description = StaticWorld.Instance.CubeDescriptions[meshf.BlockType];
-
-            var b = description.GetCubeContents();
-
-            float keysort = (float)meshf.BlockType + ((float)meshf.Cubeside) / 10;
-
-            var a = StaticWorld.Instance.CubeDescriptions[meshf.BlockType];
-            var mt = a.CubeContent[meshf.Cubeside];
-
-            string key = mt.name;
-
-            if (!combineinstanceNew.ContainsKey(key))
+            foreach (BlockQuad meshf in blockQuads)
             {
-                combineinstanceNew.Add(key, new MeshCombines { SortIndex = keysort, Materials = new List<Material>() });
+                CombineInstance instance = default;
+
+                instance.mesh = meshf.MeshFilter.sharedMesh;
+                instance.transform = meshf.MeshFilter.transform.localToWorldMatrix;
+
+                CubeDescription cubeDescription = StaticWorld.Instance.CubeDescriptions[meshf.BlockType];
+                Material material = cubeDescription.CubeContent[meshf.Cubeside];
+
+                string key = material.name;
+
+                if (!combineinstanceNew.ContainsKey(key))
+                {
+                    combineinstanceNew.Add(key, new MeshCombines {Materials = new List<Material>()});
+                }
+
+                combineinstanceNew[key].Materials.Add(material);
+                combineinstanceNew[key].Add(instance);
             }
-
-            
-           
-
-            combineinstanceNew[key].Materials.Add(mt);
-            combineinstanceNew[key].Add(instance);
-
-            //foreach (KeyValuePair<Cubeside, Material> keyValuePair in b)
-            //{
-            //    float keysort = (float) meshf.BlockType + ((float) keyValuePair.Key) / 10;
-
-            //    string key = keyValuePair.Value.name;
-
-            //    if (!combineinstanceNew.ContainsKey(key))
-            //    {
-            //        combineinstanceNew.Add(key, new MeshCombines { SortIndex = keysort,Materials = new List<Material>()});
-            //    }
-
-            //    combineinstanceNew[key].Materials.Add(keyValuePair.Value);
-            //    combineinstanceNew[key].Add(instance);
-            //}
-
-
-
-
-            i++;
         }
 
-        List<MeshCombines> sortdelist = combineinstanceNew.ToList().Select(c => c.Value).ToList();
 
-        sortdelist.Sort(Compare);
+        Mesh[] meshes = new Mesh[combineinstanceNew.Count];
 
-        List<Mesh> meshes = new List<Mesh>();
+        HashSet<Material> materialsHashSet = new HashSet<Material>();
 
-        HashSet<Material> mat = new HashSet<Material>();
 
-        //List<Material> mat = new List<Material>();
-
-        for (int j = 0; j < sortdelist.Count; j++)
+        // Enumerate dictionary to define materials and mehses
         {
-            var tempColl = sortdelist.ElementAt(j);
-
-            Mesh mesh = new Mesh();
-
-            //try
-            //{
-            //    Material[] a = this.cubes[j].GetComponentsInChildren<MeshRenderer>().Select(mr => mr.sharedMaterial).Distinct().ToArray();
-
-            //    foreach (Material material in a)
-            //    {
-            //        mat.Add(material);
-            //    }
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine(e);
-            //}
-
-            foreach (Material material in tempColl.Materials)
+            for (int i = 0; i < combineinstanceNew.Count; i++)
             {
-                mat.Add(material);
+                MeshCombines tempColl = combineinstanceNew.ElementAt(i).Value;
+
+                foreach (Material material in tempColl.Materials)
+                {
+                    materialsHashSet.Add(material);
+                }
+
+                Mesh mesh = new Mesh();
+                mesh.CombineMeshes(tempColl.ToArray(), true, true);
+                meshes[i] = mesh;
             }
-
-            mesh.CombineMeshes(tempColl.ToArray(), true, true);
-            meshes.Add(mesh);
-
         }
 
-        issuedMaterials = mat.ToArray();
+        issuedMaterials = materialsHashSet.ToArray();
 
         return Combine(meshes.ToArray());
-    }
-
-    private static int Compare(MeshCombines mesh1, MeshCombines mesh2)
-    {
-        if (mesh1.SortIndex > mesh2.SortIndex)
-            return 1;
-        else if (mesh1.SortIndex < mesh2.SortIndex)
-            return -1;
-        else
-        {
-            return 0;
-        }
     }
 
     private static Mesh Combine(Mesh[] meshes)
@@ -428,38 +366,6 @@ public class Chunk
 
         this.chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
     }
-
-    //public void ReMeshFilter()
-    //{
-    //    List<MeshFilter> meshFilters = this.MeshFilters;
-
-    //    CombineInstance[] combine = new CombineInstance[meshFilters.Count];
-    //    int i = 0;
-    //    while (i < meshFilters.Count)
-    //    {
-    //        combine[i].mesh = meshFilters[i].sharedMesh;
-    //        combine[i].transform = meshFilters[i].transform.localToWorldMatrix;
-    //        i++;
-    //    }
-
-
-    //    Object.DestroyImmediate(this.chunk.GetComponent<MeshFilter>());
-    //    MeshFilter mf = (MeshFilter)this.chunk.gameObject.AddComponent(typeof(MeshFilter));
-    //    mf.mesh = new Mesh();
-    //    mf.mesh.CombineMeshes(combine);
-
-
-    //    //Object.DestroyImmediate(this.chunk.GetComponent<MeshRenderer>());
-    //    //MeshRenderer renderer = this.chunk.gameObject.AddComponent(typeof(MeshRenderer)) as MeshRenderer;
-    //    //renderer.material = this.cubeMaterial;
-
-
-    //    //Object.DestroyImmediate(this.chunk.GetComponent<MeshCollider>());
-    //    //MeshCollider collider = this.chunk.gameObject.AddComponent(typeof(MeshCollider)) as MeshCollider;
-    //    this.chunk.GetComponent<MeshCollider>().sharedMesh = mf.mesh;
-
-
-    //}
 
     public void ReDrawChunk()
     {
