@@ -61,6 +61,7 @@
      <Compile Include="Assets\Scripts\BlockBuilder.cs" />
      <Compile Include="Assets\Scripts\BlockData.cs" />
      <Compile Include="Assets\Scripts\BlockInteraction.cs" />
+     <Compile Include="Assets\Scripts\BlockKind.cs" />
      <Compile Include="Assets\Scripts\BlockQuad.cs" />
      <Compile Include="Assets\Scripts\BlockType.cs" />
      <Compile Include="Assets\Scripts\CameraController.cs" />
@@ -89,6 +90,7 @@
      <None Include="Assets\Kino\Motion\Shader\Reconstruction.cginc" />
      <None Include="Assets\Kino\Motion\Shader\FrameBlending.shader" />
      <None Include="Assets\Kino\Motion\Shader\Common.cginc" />
+     <None Include="Assets\Shaiders\GlowShaider.shader" />
  <Reference Include="Unity.TextMeshPro.Editor">
  <HintPath>C:/Users/Maxim/source/repos/NewMineDynamic/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>

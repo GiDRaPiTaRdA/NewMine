@@ -15,17 +15,25 @@ public class BlockInteraction : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha1))
         {
-            block = BlockType.GRASS;
+            this.block = BlockType.GRASS;
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha2))
         {
-            block = BlockType.DIRT;
+            this.block = BlockType.DIRT;
         }
 
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            block = BlockType.STONE; 
+            this.block = BlockType.STONE; 
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha4))
+        {
+            this.block = BlockType.GLASS;
+        }
+        if (Input.GetKeyDown(KeyCode.Alpha5))
+        {
+            this.block = BlockType.GLOWSTONE;
         }
         //this.Input1();
     }

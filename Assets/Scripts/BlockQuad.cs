@@ -87,7 +87,7 @@ namespace Assets.Scripts
             this.QuadGameObject.transform.localScale *= 1f;
 
             this.MeshFilter = (MeshFilter)this.QuadGameObject.AddComponent(typeof(MeshFilter));
-            this.MeshFilter.tag = blockType.ToString();
+            
             this.MeshFilter.mesh = mesh;
         }
 

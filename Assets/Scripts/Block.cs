@@ -7,9 +7,11 @@ namespace Assets.Scripts
 {
     public class Block
     {
-
         public BlockType bType;
-        public bool isSolid;
+
+        public BlockKind bKind;
+
+
         public readonly Chunk owner;
         readonly GameObject parent;
         public Vector3 position;
@@ -59,30 +61,20 @@ namespace Assets.Scripts
 
         public Block(BlockType b, Vector3 pos, GameObject p, Chunk o)
         {
-            this.bType = b;
+            this.SetType(b);
             this.owner = o;
             this.parent = p;
             this.position = pos;
             this.MeshFilters = new List<BlockQuad>();
-
-            if (this.bType == BlockType.AIR)
-                this.isSolid = false;
-            else
-                this.isSolid = true;
         }
 
         public void SetType(BlockType b)
         {
             this.bType = b;
-            if (this.bType == BlockType.AIR)
-                this.isSolid = false;
-            else
-                this.isSolid = true;
+            
+            this.bKind = b==BlockType.AIR?
+                BlockKind.Invisible : StaticWorld.Instance.CubeDescriptions[b].blockKind;
         }
-
-
-
-
 
         public bool HasSolidNeighbour(int x, int y, int z)
         {
@@ -115,7 +107,9 @@ namespace Assets.Scripts
 
             try
             {
-                return chunks[x, y, z].isSolid;
+                var kind = chunks[x, y, z].bKind;
+
+                return kind == BlockKind.Solid || (this.bKind ==BlockKind.Transparent && kind==BlockKind.Transparent);
             }
             catch (IndexOutOfRangeException)
             {

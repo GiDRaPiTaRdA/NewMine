@@ -1,11 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Assets.Scripts;
 using UnityEngine;
 
 public class CubeDescription : MonoBehaviour
 {
     public BlockType blockType;
+
+    public BlockKind blockKind;
 
     private Dictionary<Cubeside, Material> cubeContent;
 
