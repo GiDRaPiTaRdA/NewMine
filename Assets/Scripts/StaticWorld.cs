@@ -63,9 +63,6 @@ namespace Assets.Scripts
             this.transform.position = Vector3.zero;
             this.transform.rotation = Quaternion.identity;
             this.StartCoroutine(this.BuildWorld());
-
-           // this.textureAtlas.mainTexture.
-            //this.textureAtlas.mainTexture.mipMapBias = +0;
         }
 
         public static Block GetWorldBlock(Vector3 pos)

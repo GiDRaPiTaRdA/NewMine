@@ -10,6 +10,8 @@ public class CubeDescription : MonoBehaviour
 
     public BlockKind blockKind;
 
+    public GameObject[] cubeGameObjects;
+
     private Dictionary<Cubeside, Material> cubeContent;
 
     public Dictionary<Cubeside, Material> CubeContent =>

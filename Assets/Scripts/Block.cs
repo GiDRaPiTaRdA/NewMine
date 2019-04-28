@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
+using LightType = UnityEngine.LightType;
 using Object = UnityEngine.Object;
 
 namespace Assets.Scripts
@@ -11,6 +14,7 @@ namespace Assets.Scripts
 
         public BlockKind bKind;
 
+        public GameObject[] blockObjects;
 
         public readonly Chunk owner;
         readonly GameObject parent;
@@ -66,14 +70,50 @@ namespace Assets.Scripts
             this.parent = p;
             this.position = pos;
             this.MeshFilters = new List<BlockQuad>();
+
+
         }
 
         public void SetType(BlockType b)
         {
+            BlockType oldType = this.bType;
             this.bType = b;
-            
-            this.bKind = b==BlockType.AIR?
-                BlockKind.Invisible : StaticWorld.Instance.CubeDescriptions[b].blockKind;
+
+
+            this.bKind = b == BlockType.AIR ?
+                BlockKind.Invisible : StaticWorld.Instance.CubeDescriptions[this.bType].blockKind;
+
+
+
+
+            GameObject[] tempGameObjects = null;
+
+            if (this.bType != BlockType.AIR)
+            {
+                CubeDescription cubeDescription = StaticWorld.Instance.CubeDescriptions[this.bType];
+
+                tempGameObjects = cubeDescription.cubeGameObjects;
+            }
+            else
+            {
+                tempGameObjects = new GameObject[0];
+            }
+
+            this.blockObjects?.ToList().ForEach(Object.Destroy);
+
+            this.blockObjects = new GameObject[tempGameObjects.Length];
+
+            for (int index = 0; index < tempGameObjects.Length; index++)
+            {
+                GameObject cubeGameObject = tempGameObjects[index];
+
+                GameObject obj = Object.Instantiate(cubeGameObject);
+                obj.transform.position = this.position;
+                obj.transform.SetParent(this.parent.transform, false);
+               
+                this.blockObjects[index] = obj;
+            }
+
         }
 
         public bool HasSolidNeighbour(int x, int y, int z)
@@ -87,9 +127,9 @@ namespace Assets.Scripts
                 //block in a neighbouring chunk
 
                 Vector3 neighbourChunkPos = this.parent.transform.position +
-                                            new Vector3((x - (int) this.position.x) * World.chunkSize,
-                                                (y - (int) this.position.y) * World.chunkSize,
-                                                (z - (int) this.position.z) * World.chunkSize);
+                                            new Vector3((x - (int)this.position.x) * World.chunkSize,
+                                                (y - (int)this.position.y) * World.chunkSize,
+                                                (z - (int)this.position.z) * World.chunkSize);
 
                 x = World.ConvertBlockIndexToLocal(x);
                 y = World.ConvertBlockIndexToLocal(y);
@@ -109,7 +149,7 @@ namespace Assets.Scripts
             {
                 var kind = chunks[x, y, z].bKind;
 
-                return kind == BlockKind.Solid || (this.bKind ==BlockKind.Transparent && kind==BlockKind.Transparent);
+                return kind == BlockKind.Solid || (this.bKind == BlockKind.Transparent && kind == BlockKind.Transparent);
             }
             catch (IndexOutOfRangeException)
             {
@@ -120,7 +160,7 @@ namespace Assets.Scripts
 
         public bool HasSolidNeighbour(Vector3 pos)
         {
-            return this.HasSolidNeighbour(new Position((int) pos.x, (int) pos.y, (int) pos.z));
+            return this.HasSolidNeighbour(new Position((int)pos.x, (int)pos.y, (int)pos.z));
         }
 
         public bool HasSolidNeighbour(Position pos)
@@ -140,22 +180,24 @@ namespace Assets.Scripts
 
             if (this.bType == BlockType.AIR) return;
 
-            if (!this.HasSolidNeighbour((int) this.position.x, (int) this.position.y, (int) this.position.z + 1))
+
+
+            if (!this.HasSolidNeighbour((int)this.position.x, (int)this.position.y, (int)this.position.z + 1))
                 this.MeshFilters.Add(new BlockQuad(Cubeside.FRONT, this.bType, this.parent.transform, this.position));
 
-            if (!this.HasSolidNeighbour((int) this.position.x, (int) this.position.y, (int) this.position.z - 1))
+            if (!this.HasSolidNeighbour((int)this.position.x, (int)this.position.y, (int)this.position.z - 1))
                 this.MeshFilters.Add(new BlockQuad(Cubeside.BACK, this.bType, this.parent.transform, this.position));
 
-            if (!this.HasSolidNeighbour((int) this.position.x, (int) this.position.y + 1, (int) this.position.z))
+            if (!this.HasSolidNeighbour((int)this.position.x, (int)this.position.y + 1, (int)this.position.z))
                 this.MeshFilters.Add(new BlockQuad(Cubeside.TOP, this.bType, this.parent.transform, this.position));
 
-            if (!this.HasSolidNeighbour((int) this.position.x, (int) this.position.y - 1, (int) this.position.z))
+            if (!this.HasSolidNeighbour((int)this.position.x, (int)this.position.y - 1, (int)this.position.z))
                 this.MeshFilters.Add(new BlockQuad(Cubeside.BOTTOM, this.bType, this.parent.transform, this.position));
 
-            if (!this.HasSolidNeighbour((int) this.position.x - 1, (int) this.position.y, (int) this.position.z))
+            if (!this.HasSolidNeighbour((int)this.position.x - 1, (int)this.position.y, (int)this.position.z))
                 this.MeshFilters.Add(new BlockQuad(Cubeside.LEFT, this.bType, this.parent.transform, this.position));
 
-            if (!this.HasSolidNeighbour((int) this.position.x + 1, (int) this.position.y, (int) this.position.z))
+            if (!this.HasSolidNeighbour((int)this.position.x + 1, (int)this.position.y, (int)this.position.z))
                 this.MeshFilters.Add(new BlockQuad(Cubeside.RIGHT, this.bType, this.parent.transform, this.position));
 
             //this.MeshFilters.ForEach(mf =>
