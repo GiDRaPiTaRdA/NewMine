@@ -149,7 +149,11 @@ namespace Assets.Scripts
             {
                 var kind = chunks[x, y, z].bKind;
 
-                return kind == BlockKind.Solid || (this.bKind == BlockKind.Transparent && kind == BlockKind.Transparent);
+                return kind == BlockKind.Solid || 
+                       (this.bKind == BlockKind.Transparent && kind == BlockKind.Transparent)
+                       ||
+                       (this.bKind == BlockKind.Glowing && kind == BlockKind.Glowing)
+                    ;
             }
             catch (IndexOutOfRangeException)
             {

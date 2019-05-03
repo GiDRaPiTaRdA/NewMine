@@ -510,7 +510,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8326503629281571401}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18.99, y: 9.58, z: 12.69}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1369453203982123716}
@@ -534,6 +534,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 02f53dd2584feca4e99f80f1647469f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blockType: 0
+  blockKind: 0
+  cubeGameObjects: []
 --- !u!1 &9043132798806516470
 GameObject:
   m_ObjectHideFlags: 0
