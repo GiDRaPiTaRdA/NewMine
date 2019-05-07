@@ -605,7 +605,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockType: 4
-  blockKind: 1
+  blockKind: 0
   cubeGameObjects:
   - {fileID: 7788455885129736342}
 --- !u!1 &7788455885940242243

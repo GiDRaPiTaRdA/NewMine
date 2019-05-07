@@ -39,8 +39,8 @@ namespace Assets.Scripts
     //            if (!chunks.TryGetValue(chunkPosition, out Chunk c))
     //            {
     //                c = new Chunk(chunkPosition, this.textureAtlas);
-    //                c.chunk.transform.parent = this.transform;
-    //                chunks.TryAdd(c.chunk.transform.position, c);
+    //                c.chunkGameObject.transform.parent = this.transform;
+    //                chunks.TryAdd(c.chunkGameObject.transform.position, c);
     //            }
     //        }
 
@@ -93,9 +93,9 @@ namespace Assets.Scripts
     //            }
 
     //            var bPos = this.lastbuildPos;
-    //            var chPos = c.Value.chunk.transform.position;
+    //            var chPos = c.Value.chunkGameObject.transform.position;
 
-    //            if (c.Value.chunk && c.Value.status == Chunk.ChunkStatus.DONE &&
+    //            if (c.Value.chunkGameObject && c.Value.status == Chunk.ChunkStatus.DONE &&
     //                Mathf.Pow(bPos.x - chPos.x, 2) + Mathf.Pow(bPos.y - chPos.y, 2) + Mathf.Pow(bPos.z - chPos.z, 2) > Mathf.Pow((radius + 1) * World.chunkSize, 2))
     //                toRemove.Enqueue(c.Key);
 
@@ -112,7 +112,7 @@ namespace Assets.Scripts
     //            if (chunks.TryGetValue(n, out Chunk c))
     //            {
 
-    //                Destroy(c.chunk);
+    //                Destroy(c.chunkGameObject);
     //                c.Save();
     //                chunks.TryRemove(n, out c);
     //                yield return null;
@@ -146,7 +146,7 @@ namespace Assets.Scripts
     //        this.transform.rotation = Quaternion.identity;
     //        this.queue = new CoroutineQueue(maxCoroutines, this.StartCoroutine);
 
-    //        //build starting chunk
+    //        //build starting chunkGameObject
     //        this.BuildChunkAt((int)(this.player.transform.position.x / World.chunkSize),
     //            (int)(this.player.transform.position.y / World.chunkSize),
     //            (int)(this.player.transform.position.z / World.chunkSize));

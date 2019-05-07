@@ -17,7 +17,7 @@ using Assets.Scripts;
         for (int y = 0; y < World.chunkSize; y++)
         for (int x = 0; x < World.chunkSize; x++)
         {
-            this.matrix[x, y, z] = b[x, y, z].bType;
+            this.matrix[x, y, z] = b[x, y, z].Type;
         }
     }
 }

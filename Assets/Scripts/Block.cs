@@ -10,87 +10,46 @@ namespace Assets.Scripts
 {
     public class Block
     {
-        public BlockType bType;
+        public BlockType Type { get; set; }
 
-        public BlockKind bKind;
+        public BlockKind Kind { get; set; }
 
-        public GameObject[] blockObjects;
+        public Chunk Chunk { get; set; }
+        private Transform ParentTransform => this.Chunk.ChunkGameObject.transform;
+        public Vector3 Position { get; set; }
 
-        public readonly Chunk owner;
-        readonly GameObject parent;
-        public Vector3 position;
+        /// <summary>
+        ///  Quads of block
+        /// </summary>
+        public List<BlockQuad> BlockQuads { get; }
 
-        public List<BlockQuad> MeshFilters { get; private set; }
+        /// <summary>
+        /// Additional GM of Block for example light source
+        /// </summary>
+        public GameObject[] BlockObjects { get; set; }
 
 
-
-        //public static readonly Vector2[,] blockUVs =
-        //{
-        //    /*GRASS TOP*/
-        //    {
-        //        new Vector2(0.5f, 0.8125f),new Vector2(0.5625f,0.8125f),
-        //        new Vector2(0.5f,0.875f),new Vector2(0.5625f,0.875f)
-        //    },
-        //    /*GRASS SIDE*/
-        //    {
-        //        new Vector2(0.1875f, 0.9375f), new Vector2(0.25f, 0.9375f),
-        //        new Vector2(0.1875f, 1.0f), new Vector2(0.25f, 1.0f)
-        //    },
-        //    /*DIRT*/
-        //    {
-        //        new Vector2(0.125f, 0.9375f), new Vector2(0.1875f, 0.9375f),
-        //        new Vector2(0.125f, 1.0f), new Vector2(0.1875f, 1.0f)
-        //    },
-        //    /*STONE*/
-        //    {
-        //        new Vector2(0, 0.875f), new Vector2(0.0625f, 0.875f),
-        //        new Vector2(0, 0.9375f), new Vector2(0.0625f, 0.9375f)
-        //    },
-        //    /*BEDROCK*/
-        //    {
-        //        new Vector2(0.3125f, 0.8125f), new Vector2(0.375f, 0.8125f),
-        //        new Vector2(0.3125f, 0.875f), new Vector2(0.375f, 0.875f)
-        //    },
-        //    /*REDSTONE*/
-        //    {
-        //        new Vector2(0.1875f, 0.75f), new Vector2(0.25f, 0.75f),
-        //        new Vector2(0.1875f, 0.8125f), new Vector2(0.25f, 0.8125f)
-        //    },
-        //    /*DIAMOND*/
-        //    {
-        //        new Vector2(0.125f, 0.75f), new Vector2(0.1875f, 0.75f),
-        //        new Vector2(0.125f, 0.8125f), new Vector2(0.1875f, 0.8125f)
-        //    }
-        //};
-
-        public Block(BlockType b, Vector3 pos, GameObject p, Chunk o)
+        public Block(BlockType blockType, Vector3 pos, Chunk chunk)
         {
-            this.SetType(b);
-            this.owner = o;
-            this.parent = p;
-            this.position = pos;
-            this.MeshFilters = new List<BlockQuad>();
-
-
+            this.SetType(blockType);
+            this.Chunk = chunk;
+            this.Position = pos;
+            this.BlockQuads = new List<BlockQuad>(6);
         }
 
         public void SetType(BlockType b)
         {
-            BlockType oldType = this.bType;
-            this.bType = b;
+            BlockType oldType = this.Type;
+            this.Type = b;
 
+            this.Kind = StaticWorld.Instance.CubeDescriptions[this.Type].blockKind;
 
-            this.bKind = b == BlockType.AIR ?
-                BlockKind.Invisible : StaticWorld.Instance.CubeDescriptions[this.bType].blockKind;
-
-
-
-
+            // CUBE GAMEOBJECTS
             GameObject[] tempGameObjects = null;
 
-            if (this.bType != BlockType.AIR)
+            if (this.Type != BlockType.AIR)
             {
-                CubeDescription cubeDescription = StaticWorld.Instance.CubeDescriptions[this.bType];
+                CubeDescription cubeDescription = StaticWorld.Instance.CubeDescriptions[this.Type];
 
                 tempGameObjects = cubeDescription.cubeGameObjects;
             }
@@ -99,19 +58,19 @@ namespace Assets.Scripts
                 tempGameObjects = new GameObject[0];
             }
 
-            this.blockObjects?.ToList().ForEach(Object.Destroy);
+            this.BlockObjects?.ToList().ForEach(Object.Destroy);
 
-            this.blockObjects = new GameObject[tempGameObjects.Length];
+            this.BlockObjects = new GameObject[tempGameObjects.Length];
 
             for (int index = 0; index < tempGameObjects.Length; index++)
             {
                 GameObject cubeGameObject = tempGameObjects[index];
 
                 GameObject obj = Object.Instantiate(cubeGameObject);
-                obj.transform.position = this.position;
-                obj.transform.SetParent(this.parent.transform, false);
-               
-                this.blockObjects[index] = obj;
+                obj.transform.position = this.Position;
+                obj.transform.SetParent(this.ParentTransform, false);
+
+                this.BlockObjects[index] = obj;
             }
 
         }
@@ -124,39 +83,40 @@ namespace Assets.Scripts
                 y < 0 || y >= World.chunkSize ||
                 z < 0 || z >= World.chunkSize)
             {
-                //block in a neighbouring chunk
-
-                Vector3 neighbourChunkPos = this.parent.transform.position +
-                                            new Vector3((x - (int)this.position.x) * World.chunkSize,
-                                                (y - (int)this.position.y) * World.chunkSize,
-                                                (z - (int)this.position.z) * World.chunkSize);
+                //block in a neighbouring chunkGameObject
+                Vector3 neighbourChunkPos = this.ParentTransform.position +
+                                            new Vector3((x - (int)this.Position.x) * World.chunkSize,
+                                                (y - (int)this.Position.y) * World.chunkSize,
+                                                (z - (int)this.Position.z) * World.chunkSize);
 
                 x = World.ConvertBlockIndexToLocal(x);
                 y = World.ConvertBlockIndexToLocal(y);
                 z = World.ConvertBlockIndexToLocal(z);
 
-                if (StaticWorld.chunks.TryGetValue(neighbourChunkPos, out Chunk nChunk))
+                if (StaticWorld.Instance.Chunks.TryGetValue(neighbourChunkPos, out Chunk nChunk))
                 {
-                    chunks = nChunk.chunkData.chunkData;
+                    chunks = nChunk.ChunkData.chunkData;
                 }
                 else
                     return false;
-            } //block in this chunk
+            } //block in this chunkGameObject
             else
-                chunks = this.owner.chunkData.chunkData;
+            {
+                chunks = this.Chunk.ChunkData.chunkData;
+            }
 
             try
             {
-                var kind = chunks[x, y, z].bKind;
+                BlockKind neighbourKind = chunks[x, y, z].Kind;
 
-                return kind == BlockKind.Solid || 
-                       (this.bKind == BlockKind.Transparent && kind == BlockKind.Transparent)
-                       ||
-                       (this.bKind == BlockKind.Glowing && kind == BlockKind.Glowing)
+                return neighbourKind == BlockKind.Solid ||
+                       (this.Kind == BlockKind.Transparent && neighbourKind == BlockKind.Transparent)||
+                       (this.Kind == BlockKind.Glowing && neighbourKind == BlockKind.Glowing)
                     ;
             }
             catch (IndexOutOfRangeException)
             {
+                Debug.LogWarning("sOME OUT OF RANGE IN block");
             }
 
             return false;
@@ -174,42 +134,35 @@ namespace Assets.Scripts
 
         public void Draw()
         {
-            this.MeshFilters.ForEach(mf =>
+            this.BlockQuads.ForEach(blockQuad =>
             {
-                this.owner.MeshFiltersBlock.Remove(mf);
-                //this.owner.MeshFilters.Remove(mf.MeshFilter);
-                Object.Destroy(mf.QuadGameObject);
+                this.Chunk.MeshFiltersBlock.Remove(blockQuad);
+                Object.Destroy(blockQuad.MeshFilter);
+                Object.Destroy(blockQuad.QuadGameObject);
             });
-            this.MeshFilters.Clear();
+            this.BlockQuads.Clear();
 
-            if (this.bType == BlockType.AIR) return;
+            if (this.Type == BlockType.AIR) return;
 
+            if (!this.HasSolidNeighbour((int)this.Position.x, (int)this.Position.y, (int)this.Position.z + 1))
+                this.BlockQuads.Add(new BlockQuad(Cubeside.FRONT, this.Type, this.ParentTransform, this.Position));
 
+            if (!this.HasSolidNeighbour((int)this.Position.x, (int)this.Position.y, (int)this.Position.z - 1))
+                this.BlockQuads.Add(new BlockQuad(Cubeside.BACK, this.Type, this.ParentTransform, this.Position));
 
-            if (!this.HasSolidNeighbour((int)this.position.x, (int)this.position.y, (int)this.position.z + 1))
-                this.MeshFilters.Add(new BlockQuad(Cubeside.FRONT, this.bType, this.parent.transform, this.position));
+            if (!this.HasSolidNeighbour((int)this.Position.x, (int)this.Position.y + 1, (int)this.Position.z))
+                this.BlockQuads.Add(new BlockQuad(Cubeside.TOP, this.Type, this.ParentTransform, this.Position));
 
-            if (!this.HasSolidNeighbour((int)this.position.x, (int)this.position.y, (int)this.position.z - 1))
-                this.MeshFilters.Add(new BlockQuad(Cubeside.BACK, this.bType, this.parent.transform, this.position));
+            if (!this.HasSolidNeighbour((int)this.Position.x, (int)this.Position.y - 1, (int)this.Position.z))
+                this.BlockQuads.Add(new BlockQuad(Cubeside.BOTTOM, this.Type, this.ParentTransform, this.Position));
 
-            if (!this.HasSolidNeighbour((int)this.position.x, (int)this.position.y + 1, (int)this.position.z))
-                this.MeshFilters.Add(new BlockQuad(Cubeside.TOP, this.bType, this.parent.transform, this.position));
+            if (!this.HasSolidNeighbour((int)this.Position.x - 1, (int)this.Position.y, (int)this.Position.z))
+                this.BlockQuads.Add(new BlockQuad(Cubeside.LEFT, this.Type, this.ParentTransform, this.Position));
 
-            if (!this.HasSolidNeighbour((int)this.position.x, (int)this.position.y - 1, (int)this.position.z))
-                this.MeshFilters.Add(new BlockQuad(Cubeside.BOTTOM, this.bType, this.parent.transform, this.position));
+            if (!this.HasSolidNeighbour((int)this.Position.x + 1, (int)this.Position.y, (int)this.Position.z))
+                this.BlockQuads.Add(new BlockQuad(Cubeside.RIGHT, this.Type, this.ParentTransform, this.Position));
 
-            if (!this.HasSolidNeighbour((int)this.position.x - 1, (int)this.position.y, (int)this.position.z))
-                this.MeshFilters.Add(new BlockQuad(Cubeside.LEFT, this.bType, this.parent.transform, this.position));
-
-            if (!this.HasSolidNeighbour((int)this.position.x + 1, (int)this.position.y, (int)this.position.z))
-                this.MeshFilters.Add(new BlockQuad(Cubeside.RIGHT, this.bType, this.parent.transform, this.position));
-
-            //this.MeshFilters.ForEach(mf =>
-            //{
-            //    this.owner.MeshFilters.Add(mf.MeshFilter);
-            //});
-
-            this.owner.MeshFiltersBlock.AddRange(this.MeshFilters);
+            this.Chunk.MeshFiltersBlock.AddRange(this.BlockQuads);
         }
     }
 }

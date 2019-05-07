@@ -11,20 +11,19 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
 
-// ReSharper disable InconsistentNaming
 
 public class Chunk
 {
-    public ChunkData chunkData;
-    public GameObject chunk;
+    public ChunkData ChunkData { get; set; }
+    public GameObject ChunkGameObject { get; set; }
+    public Transform ChunkTransform => this.ChunkGameObject.transform;
+
     public Vector3 Position { get; set; }
 
-    // todo MESHfILTER CONTAINERS
-    // public List<MeshFilter> MeshFilters { get; set; }
     public List<BlockQuad> MeshFiltersBlock { get; set; }
 
 
-    BlockData bd;
+    // private BlockData bd;
 
     //static string BuildChunkFileName(Vector3 v)
     //{
@@ -39,7 +38,7 @@ public class Chunk
 
     //bool Load() //read data from file
     //{
-    //    string chunkFile = BuildChunkFileName(this.chunk.transform.position);
+    //    string chunkFile = BuildChunkFileName(this.chunkGameObject.transform.position);
     //    if (File.Exists(chunkFile))
     //    {
     //        BinaryFormatter bf = new BinaryFormatter();
@@ -51,7 +50,7 @@ public class Chunk
     //        }
 
     //        return true;
-    //        //Debug.Log("Loading chunk from file: " + chunkFile);
+    //        //Debug.Log("Loading chunkGameObject from file: " + chunkFile);
 
     //    }
     //    return false;
@@ -59,7 +58,7 @@ public class Chunk
 
     //public void Save() //write data to file
     //{
-    //    string chunkFile = BuildChunkFileName(this.chunk.transform.position);;
+    //    string chunkFile = BuildChunkFileName(this.chunkGameObject.transform.position);;
 
     //    if (!File.Exists(chunkFile))
     //    {
@@ -74,41 +73,49 @@ public class Chunk
     //        bf.Serialize(file, this.bd);
     //    }
 
-    //    //Debug.Log("Saving chunk from file: " + chunkFile);
+    //    //Debug.Log("Saving chunkGameObject from file: " + chunkFile);
     //}
 
-    void BuildChunk()
+    private void BuildChunk()
     {
-        this.chunkData = new ChunkData(new Block[World.chunkSize, World.chunkSize, World.chunkSize]);
+        this.ChunkData = new ChunkData(new Block[World.chunkSize, World.chunkSize, World.chunkSize]);
         for (int z = 0; z < World.chunkSize; z++)
             for (int y = 0; y < World.chunkSize; y++)
                 for (int x = 0; x < World.chunkSize; x++)
                 {
                     Vector3 pos = new Vector3(x, y, z);
-                    int worldX = (int)(x + this.chunk.transform.position.x);
-                    int worldY = (int)(y + this.chunk.transform.position.y);
-                    int worldZ = (int)(z + this.chunk.transform.position.z);
+                    int worldX = (int)(x + this.ChunkTransform.position.x);
+                    int worldY = (int)(y + this.ChunkTransform.position.y);
+                    int worldZ = (int)(z + this.ChunkTransform.position.z);
                     int surfaceHeight = Utils.GenerateHeight(worldX, worldZ);
                     //int surfaceHeight = StaticWorld.columnHeight * World.chunkSize;
 
+                    Transform chunkTransform = this.ChunkGameObject.gameObject.transform;
+
                     if (worldY == 0)
-                        this.chunkData[x, y, z] = new Block(BlockType.DIRT, pos, this.chunk.gameObject, this);
+                    {
+                        this.ChunkData[x, y, z] = new Block(BlockType.DIRT, pos, this);
+                    }
                     else if (Utils.fBM3D(worldX, worldY, worldZ, 0.1f, 3) < 0.42f)
-                        this.chunkData[x, y, z] = new Block(BlockType.AIR, pos, this.chunk.gameObject, this);
+                    {
+                        this.ChunkData[x, y, z] = new Block(BlockType.AIR, pos, this);
+                    }
 
                     else if (worldY <= Utils.GenerateStoneHeight(worldX, worldZ))
                     {
-                        this.chunkData[x, y, z] = new Block(BlockType.STONE, pos, this.chunk.gameObject, this);
+                        this.ChunkData[x, y, z] = new Block(BlockType.STONE, pos, this);
                     }
                     else if (worldY == surfaceHeight)
                     {
-                        this.chunkData[x, y, z] = new Block(BlockType.GRASS, pos, this.chunk.gameObject, this);
+                        this.ChunkData[x, y, z] = new Block(BlockType.GRASS, pos, this);
                     }
                     else if (worldY < surfaceHeight)
-                        this.chunkData[x, y, z] = new Block(BlockType.DIRT, pos, this.chunk.gameObject, this);
+                    {
+                        this.ChunkData[x, y, z] = new Block(BlockType.DIRT, pos, this);
+                    }
                     else
                     {
-                        this.chunkData[x, y, z] = new Block(BlockType.AIR, pos, this.chunk.gameObject, this);
+                        this.ChunkData[x, y, z] = new Block(BlockType.AIR, pos, this);
                     }
                 }
 
@@ -120,23 +127,22 @@ public class Chunk
             for (int y = 0; y < World.chunkSize; y++)
                 for (int x = 0; x < World.chunkSize; x++)
                 {
-                    this.chunkData[x, y, z].Draw();
+                    this.ChunkData[x, y, z].Draw();
                 }
 
         this.CombineQuads();
 
         // Update collider
-        MeshCollider collider = this.chunk.gameObject.AddComponent<MeshCollider>();
-        collider.sharedMesh = this.chunk.transform.GetComponent<MeshFilter>().mesh;
+        MeshCollider collider = this.ChunkGameObject.gameObject.AddComponent<MeshCollider>();
+        collider.sharedMesh = this.ChunkGameObject.transform.GetComponent<MeshFilter>().mesh;
     }
 
     // Use this for initialization
     public Chunk(Vector3 position)
     {
-        this.chunk = new GameObject(position.ToString());
-        this.chunk.transform.position = position;
+        this.ChunkGameObject = new GameObject(position.ToString());
+        this.ChunkGameObject.transform.position = position;
         this.Position = position;
-        // this.MeshFilters = new List<MeshFilter>();
         this.MeshFiltersBlock = new List<BlockQuad>();
         this.BuildChunk();
     }
@@ -147,15 +153,15 @@ public class Chunk
         Mesh mesh = this.ReMeshBase(this.MeshFiltersBlock.ToArray(), out Material[] issuedMaterials);
 
         //2. Create a new mesh on the parent object
-        MeshFilter mf = (MeshFilter)this.chunk.gameObject.AddComponent(typeof(MeshFilter));
+        MeshFilter mf = (MeshFilter)this.ChunkGameObject.gameObject.AddComponent(typeof(MeshFilter));
         mf.mesh = mesh;
 
         //4. Create a renderer for the parent
-        MeshRenderer renderer = this.chunk.gameObject.AddComponent<MeshRenderer>();
+        MeshRenderer renderer = this.ChunkGameObject.gameObject.AddComponent<MeshRenderer>();
         renderer.materials = issuedMaterials;
 
         ////5. Delete all uncombined children
-        foreach (Transform quad in this.chunk.transform)
+        foreach (Transform quad in this.ChunkGameObject.transform)
         {
             quad.gameObject.SetActive(false);
         }
@@ -169,21 +175,21 @@ public class Chunk
 
         // Enumerate Block Quads to fill combine meshes
         {
-            foreach (BlockQuad meshf in blockQuads)
+            foreach (BlockQuad blockQuad in blockQuads)
             {
                 CombineInstance instance = default;
 
-                instance.mesh = meshf.MeshFilter.sharedMesh;
-                instance.transform = meshf.MeshFilter.transform.localToWorldMatrix;
+                instance.mesh = blockQuad.MeshFilter.sharedMesh;
+                instance.transform = blockQuad.MeshFilter.transform.localToWorldMatrix;
 
-                CubeDescription cubeDescription = StaticWorld.Instance.CubeDescriptions[meshf.BlockType];
-                Material material = cubeDescription.CubeContent[meshf.Cubeside];
+                CubeDescription cubeDescription = StaticWorld.Instance.CubeDescriptions[blockQuad.BlockType];
+                Material material = cubeDescription.CubeContent[blockQuad.Cubeside];
 
                 string key = material.name;
 
                 if (!combineinstanceNew.ContainsKey(key))
                 {
-                    combineinstanceNew.Add(key, new MeshCombines {Materials = new List<Material>()});
+                    combineinstanceNew.Add(key, new MeshCombines { Materials = new List<Material>() });
                 }
 
                 combineinstanceNew[key].Materials.Add(material);
@@ -241,7 +247,7 @@ public class Chunk
     {
         Stopwatch s = Stopwatch.StartNew();
 
-        Block removeBlock = this.chunkData[position];
+        Block removeBlock = this.ChunkData[position];
 
         removeBlock.SetType(BlockType.AIR);
 
@@ -263,7 +269,7 @@ public class Chunk
             if (this.IsInChunk(globalPos))
             {
                 Vector3 localPos = vector3 + position;
-                this.chunkData[localPos].Draw();
+                this.ChunkData[localPos].Draw();
             }
             else
             {
@@ -271,7 +277,7 @@ public class Chunk
                 if (b != null)
                 {
                     b.Draw();
-                    b.owner.ReMeshFilter();
+                    b.Chunk.ReMeshFilter();
                 }
                 else
                 {
@@ -315,7 +321,7 @@ public class Chunk
             if (this.IsInChunk(globalPos))
             {
                 Vector3 localPos = vector3 + position;
-                this.chunkData[localPos].Draw();
+                this.ChunkData[localPos].Draw();
             }
             else
             {
@@ -323,7 +329,7 @@ public class Chunk
                 if (b != null)
                 {
                     b.Draw();
-                    b.owner.ReMeshFilter();
+                    b.Chunk.ReMeshFilter();
                 }
                 else
                 {
@@ -355,23 +361,23 @@ public class Chunk
     {
         if (meshFilters == null)
         {
-            meshFilters = this.MeshFiltersBlock;
+             meshFilters = this.MeshFiltersBlock;
         }
 
         Mesh mesh = this.ReMeshBase(meshFilters.ToArray(), out Material[] issuedMaterials);
 
-        this.chunk.gameObject.GetComponent<MeshRenderer>().materials = issuedMaterials;
+        this.ChunkGameObject.gameObject.GetComponent<MeshRenderer>().materials = issuedMaterials;
 
-        this.chunk.gameObject.GetComponent<MeshFilter>().mesh = mesh;
+        this.ChunkGameObject.gameObject.GetComponent<MeshFilter>().mesh = mesh;
 
-        this.chunk.GetComponent<MeshCollider>().sharedMesh = mesh;
+        this.ChunkGameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     public void ReDrawChunk()
     {
-        Object.DestroyImmediate(this.chunk.GetComponent<MeshFilter>());
-        Object.DestroyImmediate(this.chunk.GetComponent<MeshRenderer>());
-        Object.DestroyImmediate(this.chunk.GetComponent<Collider>());
+        Object.DestroyImmediate(this.ChunkGameObject.GetComponent<MeshFilter>());
+        Object.DestroyImmediate(this.ChunkGameObject.GetComponent<MeshRenderer>());
+        Object.DestroyImmediate(this.ChunkGameObject.GetComponent<Collider>());
         this.DrawChunk();
     }
 

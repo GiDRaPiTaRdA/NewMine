@@ -75,7 +75,6 @@
      <Compile Include="Assets\Scripts\DisplayFPS.cs" />
      <Compile Include="Assets\Scripts\DynamicWorld.cs" />
      <Compile Include="Assets\Scripts\FallFix.cs" />
-     <Compile Include="Assets\Scripts\FPSMonitoring.cs" />
      <Compile Include="Assets\Scripts\GameManager.cs" />
      <Compile Include="Assets\Scripts\GrassBlock.cs" />
      <Compile Include="Assets\Scripts\MeshCombines.cs" />
@@ -85,12 +84,18 @@
      <Compile Include="Assets\Scripts\StoneBlock.cs" />
      <Compile Include="Assets\Scripts\Utils.cs" />
      <Compile Include="Assets\Scripts\World.cs" />
+     <None Include="Assets\Shaiders\Effect\MKGlowSM25.shader" />
+     <None Include="Assets\Shaiders\Effect\MKGlowSM30.shader" />
      <None Include="Assets\Kino\Motion\Shader\Prefilter.cginc" />
      <None Include="Assets\Kino\Motion\Shader\Reconstruction.shader" />
+     <None Include="Assets\Shaiders\Effect\MKGlowSM40.shader" />
+     <None Include="Assets\Shaiders\Effect\MKGlowSM35.shader" />
      <None Include="Assets\Kino\Motion\Shader\Reconstruction.cginc" />
      <None Include="Assets\Kino\Motion\Shader\FrameBlending.shader" />
      <None Include="Assets\Kino\Motion\Shader\Common.cginc" />
+     <None Include="Assets\Shaiders\Effect\MKGlowSM20.shader" />
      <None Include="Assets\Shaiders\GlowShaider.shader" />
+     <None Include="Assets\Shaiders\Effect\MKGlowSelectiveRender.shader" />
  <Reference Include="Unity.TextMeshPro.Editor">
  <HintPath>C:/Users/Maxim/source/repos/NewMineDynamic/Library/ScriptAssemblies/Unity.TextMeshPro.Editor.dll</HintPath>
  </Reference>
