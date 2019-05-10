@@ -15,31 +15,21 @@ public class BlockInteraction : MonoBehaviour
     {
         this.MouseInputs();
 
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            this.blockType = BlockType.GRASS;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            this.blockType = BlockType.DIRT;
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3))
-        {
-            this.blockType = BlockType.STONE; 
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha4))
-        {
-            this.blockType = BlockType.GLASS;
-        }
-        if (Input.GetKeyDown(KeyCode.Alpha5))
-        {
-            this.blockType = BlockType.GLOWSTONE;
-        }
+        if (Input.GetKeyDown(KeyCode.Alpha1)) this.blockType = (BlockType)0;
+        if (Input.GetKeyDown(KeyCode.Alpha2)) this.blockType = (BlockType)1;
+        if (Input.GetKeyDown(KeyCode.Alpha3)) this.blockType = (BlockType)2;
+        if (Input.GetKeyDown(KeyCode.Alpha4)) this.blockType = (BlockType)3;
+        if (Input.GetKeyDown(KeyCode.Alpha5)) this.blockType = (BlockType)4;
+        if (Input.GetKeyDown(KeyCode.Alpha6)) this.blockType = (BlockType)5;
+        if (Input.GetKeyDown(KeyCode.Alpha7)) this.blockType = (BlockType)6;
+        if (Input.GetKeyDown(KeyCode.Alpha8)) this.blockType = (BlockType)7;
+        if (Input.GetKeyDown(KeyCode.Alpha9)) this.blockType = (BlockType)8;
+        if (Input.GetKeyDown(KeyCode.Alpha0)) this.blockType = (BlockType)9;
+        if (Input.GetKeyDown(KeyCode.Keypad1)) this.blockType = (BlockType)10;
+        if (Input.GetKeyDown(KeyCode.Keypad2)) this.blockType = (BlockType)11;
     }
 
-  
+
 
     private void MouseInputs()
     {
@@ -48,8 +38,26 @@ public class BlockInteraction : MonoBehaviour
             //for cross airs
             if (Physics.Raycast(this.cam.transform.position, this.cam.transform.forward, out RaycastHit hit, 10))
             {
-                if (!StaticWorld.Instance.Chunks.TryGetValue(hit.collider.gameObject.transform.position, out Chunk hitc)) return;
-              
+                if (!StaticWorld.Instance.Chunks.TryGetValue(hit.collider.gameObject.transform.position, out Chunk hitc))
+                {
+                    Vector3 pos = StaticWorld.GetChunkPosition(hit.collider.gameObject.transform.position);
+
+                    pos *= World.chunkSize;
+
+                    if (!StaticWorld.Instance.Chunks.TryGetValue(pos, out hitc)) return;
+                    {
+                        Vector3 p = hit.collider.gameObject.transform.position - (Vector3) pos;
+
+                        StaticWorld.Instance.StartCoroutine(hitc.RemoveBlock(p));
+
+                        return;
+                    }
+                }
+
+
+
+
+                // Remove Block
                 if (Input.GetMouseButtonDown(0))
                 {
                     Vector3 hitPos = hit.point - hit.normal / 2.0f;
@@ -58,17 +66,13 @@ public class BlockInteraction : MonoBehaviour
                         (int)(Mathf.Round(hitPos.y) - hit.collider.gameObject.transform.position.y),
                         (int)(Mathf.Round(hitPos.z) - hit.collider.gameObject.transform.position.z));
 
-                    //Debug.Log(hit.point);
-
-                    //this.RemoveBlock(hitBlock, hitc);
-
-                    //Debug.Log(hitBlock);
-
                     StaticWorld.Instance.StartCoroutine(hitc.RemoveBlock(hitBlock));
 
 
 
                 }
+
+                // Add Block
                 else
                 {
                     Vector3 hitPos = hit.point + hit.normal / 2.0f;
@@ -78,7 +82,18 @@ public class BlockInteraction : MonoBehaviour
                         (int)(Mathf.Round(hitPos.y) - hit.collider.gameObject.transform.position.y),
                         (int)(Mathf.Round(hitPos.z) - hit.collider.gameObject.transform.position.z));
 
-                    StaticWorld.Instance.StartCoroutine(hitc.AddBlock(hitBlock,this.blockType));
+
+                    Block block = StaticWorld.GetWorldBlock(hitBlock + hitc.Position);
+
+                    if (block?.Type == BlockType.AIR)
+                    {
+                        StaticWorld.Instance.StartCoroutine(hitc.AddBlock(hitBlock, this.blockType));
+                    }
+                    else
+                    {
+                        Debug.Log("Can not add block here");
+                    }
+
                 }
 
             }

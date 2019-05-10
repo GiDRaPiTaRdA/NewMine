@@ -341,7 +341,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockType: 3
-  blockKind: 2
+  blockKind: 3
   cubeGameObjects: []
 --- !u!1 &7252030637893266168
 GameObject:

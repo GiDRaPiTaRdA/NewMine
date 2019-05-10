@@ -21,15 +21,19 @@ public class CubeDescription : MonoBehaviour
     {
         Material[] materials = this.GetComponentsInChildren<MeshRenderer>().Select(mr => mr.sharedMaterial).ToArray();
 
-        var cont = new Dictionary<Cubeside, Material>()
-        {
-            {Cubeside.TOP, materials[0]},
-            {Cubeside.BOTTOM, materials[1]},
-            {Cubeside.LEFT, materials[2]},
-            {Cubeside.RIGHT, materials[3]},
-            {Cubeside.FRONT, materials[4]},
-            {Cubeside.BACK, materials[5]},
-        };
+        Dictionary<Cubeside, Material> cont;
+
+            cont = new Dictionary<Cubeside, Material>(6)
+            {
+                {Cubeside.TOP, materials[0]},
+                {Cubeside.BOTTOM, materials[1]},
+                {Cubeside.LEFT, materials[2]},
+                {Cubeside.RIGHT, materials[3]},
+                {Cubeside.FRONT, materials[4]},
+                {Cubeside.BACK, materials[5]},
+            };
+        
+      
 
         return cont;
     }

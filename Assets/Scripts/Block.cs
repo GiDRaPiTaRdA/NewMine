@@ -70,6 +70,8 @@ namespace Assets.Scripts
                 obj.transform.position = this.Position;
                 obj.transform.SetParent(this.ParentTransform, false);
 
+                Collider c = obj.GetComponentInChildren<Collider>();
+
                 this.BlockObjects[index] = obj;
             }
 
@@ -110,6 +112,7 @@ namespace Assets.Scripts
                 BlockKind neighbourKind = chunks[x, y, z].Kind;
 
                 return neighbourKind == BlockKind.Solid ||
+                      
                        (this.Kind == BlockKind.Transparent && neighbourKind == BlockKind.Transparent)||
                        (this.Kind == BlockKind.Glowing && neighbourKind == BlockKind.Glowing)
                     ;
@@ -142,7 +145,7 @@ namespace Assets.Scripts
             });
             this.BlockQuads.Clear();
 
-            if (this.Type == BlockType.AIR) return;
+            if (this.Kind == BlockKind.Invisible) return;
 
             if (!this.HasSolidNeighbour((int)this.Position.x, (int)this.Position.y, (int)this.Position.z + 1))
                 this.BlockQuads.Add(new BlockQuad(Cubeside.FRONT, this.Type, this.ParentTransform, this.Position));

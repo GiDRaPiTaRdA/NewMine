@@ -4,6 +4,7 @@
     {
         Solid,
         Glowing,
+        TransparentFull,
         Transparent,
         Invisible
     }

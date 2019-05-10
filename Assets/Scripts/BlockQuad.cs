@@ -16,6 +16,8 @@ namespace Assets.Scripts
 
         public MeshFilter MeshFilter { get; set; }
 
+        public Mesh MeshCollider { get; set; }
+
         #region MyRegion
 
         private static readonly Vector3 p0 = new Vector3(-0.5f, -0.5f, 0.5f);
@@ -81,6 +83,8 @@ namespace Assets.Scripts
 
             Mesh mesh = this.CreateQuad(cubeside);
 
+            this.MeshCollider = mesh;
+
             this.QuadGameObject = new GameObject("BlockQuad");
             this.QuadGameObject.transform.position = this.Position;
             this.QuadGameObject.transform.parent = this.ParrentTransform;
@@ -110,6 +114,8 @@ namespace Assets.Scripts
             mesh.triangles = new[] {3, 1, 0, 3, 2, 1};
 
             mesh.RecalculateBounds();
+
+            
 
             return mesh;
         }

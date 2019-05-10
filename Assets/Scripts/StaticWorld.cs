@@ -98,5 +98,12 @@ namespace Assets.Scripts
                 return null;
             }
         }
+
+        public static Position GetChunkPosition(Vector3 blockPosition)
+        {
+            Position chunkPos = new Position(blockPosition / World.chunkSize);
+
+            return chunkPos;
+        }
     }
 }

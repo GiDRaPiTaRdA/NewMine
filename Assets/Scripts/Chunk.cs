@@ -134,6 +134,7 @@ public class Chunk
 
         // Update collider
         MeshCollider collider = this.ChunkGameObject.gameObject.AddComponent<MeshCollider>();
+
         collider.sharedMesh = this.ChunkGameObject.transform.GetComponent<MeshFilter>().mesh;
     }
 
@@ -297,8 +298,6 @@ public class Chunk
 
     public IEnumerator AddBlock(Vector3 position, BlockType blockType)
     {
-        Stopwatch s = Stopwatch.StartNew();
-
         Block addBlock = StaticWorld.GetWorldBlock(position + this.Position);
 
         addBlock.SetType(blockType);
@@ -307,13 +306,13 @@ public class Chunk
 
         Vector3[] dVectors =
         {
-            new Vector3(0,0,-1),
-            new Vector3(0,0,1),
-            new Vector3(0,-1,0),
-            new Vector3(0,1,0),
-            new Vector3(-1,0,0),
-            new Vector3(1,0,0)
-        };
+                new Vector3(0, 0, -1),
+                new Vector3(0, 0, 1),
+                new Vector3(0, -1, 0),
+                new Vector3(0, 1, 0),
+                new Vector3(-1, 0, 0),
+                new Vector3(1, 0, 0)
+            };
         foreach (Vector3 vector3 in dVectors)
         {
             Vector3 globalPos = vector3 + position + this.Position;
@@ -340,10 +339,6 @@ public class Chunk
 
         this.ReMeshFilter();
 
-
-        s.Stop();
-        //Debug.Log(s.ElapsedMilliseconds);
-
         yield return null;
     }
 
@@ -361,7 +356,7 @@ public class Chunk
     {
         if (meshFilters == null)
         {
-             meshFilters = this.MeshFiltersBlock;
+            meshFilters = this.MeshFiltersBlock;
         }
 
         Mesh mesh = this.ReMeshBase(meshFilters.ToArray(), out Material[] issuedMaterials);

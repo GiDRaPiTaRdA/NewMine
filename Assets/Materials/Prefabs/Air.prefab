@@ -44,5 +44,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockType: -1
-  blockKind: 3
+  blockKind: 4
   cubeGameObjects: []
