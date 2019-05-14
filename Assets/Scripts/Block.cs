@@ -15,8 +15,11 @@ namespace Assets.Scripts
         public BlockKind Kind { get; set; }
 
         public Chunk Chunk { get; set; }
+
         private Transform ParentTransform => this.Chunk.ChunkGameObject.transform;
-        public Vector3 Position { get; set; }
+
+        public Vector3 Position { get;}
+        public Position GlobalPosition { get; }
 
         /// <summary>
         ///  Quads of block
@@ -28,12 +31,12 @@ namespace Assets.Scripts
         /// </summary>
         public GameObject[] BlockObjects { get; set; }
 
-
         public Block(BlockType blockType, Vector3 pos, Chunk chunk)
         {
             this.SetType(blockType);
             this.Chunk = chunk;
             this.Position = pos;
+            this.GlobalPosition = this.Position + this.Chunk.Position;
             this.BlockQuads = new List<BlockQuad>(6);
         }
 

@@ -21,7 +21,17 @@ public class Chunk
     public Vector3 Position { get; set; }
 
     public List<BlockQuad> MeshFiltersBlock { get; set; }
+    private static Vector3[] SideDirectionVectors => new[]
+    {
+        new Vector3(0, 0, -1),
+        new Vector3(0, 0, 1),
+        new Vector3(0, -1, 0),
+        new Vector3(0, 1, 0),
+        new Vector3(-1, 0, 0),
+        new Vector3(1, 0, 0)
+    };
 
+    #region SaveWorld
 
     // private BlockData bd;
 
@@ -75,6 +85,8 @@ public class Chunk
 
     //    //Debug.Log("Saving chunkGameObject from file: " + chunkFile);
     //}
+
+    #endregion
 
     private void BuildChunk()
     {
@@ -169,7 +181,7 @@ public class Chunk
 
     }
 
-    public Mesh ReMeshBase(BlockQuad[] blockQuads, out Material[] issuedMaterials)
+    public Mesh ReMeshBase(IEnumerable<BlockQuad> blockQuads, out Material[] issuedMaterials)
     {
         // MaterilaName/ Array of material corresponding meshFilters
         Dictionary<string, MeshCombines> combineinstanceNew = new Dictionary<string, MeshCombines>();
@@ -254,16 +266,8 @@ public class Chunk
 
         removeBlock.Draw();
 
-        Vector3[] dVectors =
-        {
-            new Vector3(0,0,-1),
-            new Vector3(0,0,1),
-            new Vector3(0,-1,0),
-            new Vector3(0,1,0),
-            new Vector3(-1,0,0),
-            new Vector3(1,0,0)
-        };
-        foreach (Vector3 vector3 in dVectors)
+      
+        foreach (Vector3 vector3 in SideDirectionVectors)
         {
             Vector3 globalPos = vector3 + position + this.Position;
 
@@ -278,6 +282,8 @@ public class Chunk
                 if (b != null)
                 {
                     b.Draw();
+
+                    // todo do nor remesh filter for all blocks
                     b.Chunk.ReMeshFilter();
                 }
                 else
@@ -304,16 +310,7 @@ public class Chunk
 
         addBlock.Draw();
 
-        Vector3[] dVectors =
-        {
-                new Vector3(0, 0, -1),
-                new Vector3(0, 0, 1),
-                new Vector3(0, -1, 0),
-                new Vector3(0, 1, 0),
-                new Vector3(-1, 0, 0),
-                new Vector3(1, 0, 0)
-            };
-        foreach (Vector3 vector3 in dVectors)
+        foreach (Vector3 vector3 in SideDirectionVectors)
         {
             Vector3 globalPos = vector3 + position + this.Position;
 
@@ -342,6 +339,44 @@ public class Chunk
         yield return null;
     }
 
+    public IEnumerator AddBlock(Block addBlock,Vector3 position, BlockType blockType)
+    {
+        addBlock.SetType(blockType);
+
+        addBlock.Draw();
+
+        foreach (Vector3 vector3 in SideDirectionVectors)
+        {
+            Vector3 globalPos = vector3 + addBlock.GlobalPosition;
+
+            if (this.IsInChunk(globalPos))
+            {
+                Vector3 localPos = globalPos - this.Position;
+
+                this.ChunkData[localPos].Draw();
+            }
+            else
+            {
+                Block b = StaticWorld.GetWorldBlock(globalPos);
+                if (b != null)
+                {
+                    b.Draw();
+
+                    // todo do not update for all blocks
+                    b.Chunk.ReMeshFilter();
+                }
+                else
+                {
+                    Debug.Log("No such block to draw");
+                }
+            }
+        }
+
+        this.ReMeshFilter();
+
+        yield return null;
+    }
+
     private bool IsInChunk(Vector3 vector)
     {
         return vector.x >= 0 + this.Position.x &&
@@ -359,7 +394,7 @@ public class Chunk
             meshFilters = this.MeshFiltersBlock;
         }
 
-        Mesh mesh = this.ReMeshBase(meshFilters.ToArray(), out Material[] issuedMaterials);
+        Mesh mesh = this.ReMeshBase(meshFilters, out Material[] issuedMaterials);
 
         this.ChunkGameObject.gameObject.GetComponent<MeshRenderer>().materials = issuedMaterials;
 

@@ -38,38 +38,46 @@ public class BlockInteraction : MonoBehaviour
             //for cross airs
             if (Physics.Raycast(this.cam.transform.position, this.cam.transform.forward, out RaycastHit hit, 10))
             {
+                bool inChunkHit;
+
+                Vector3 pos = Vector3.zero;
+
+                // Find chunk by hit tranform
                 if (!StaticWorld.Instance.Chunks.TryGetValue(hit.collider.gameObject.transform.position, out Chunk hitc))
                 {
-                    Vector3 pos = StaticWorld.GetChunkPosition(hit.collider.gameObject.transform.position);
-
-                    pos *= World.chunkSize;
+                    // Find Chunk by block position
+                    pos = StaticWorld.GetChunkPosition(hit.collider.gameObject.transform.position);
 
                     if (!StaticWorld.Instance.Chunks.TryGetValue(pos, out hitc)) return;
                     {
-                        Vector3 p = hit.collider.gameObject.transform.position - (Vector3) pos;
-
-                        StaticWorld.Instance.StartCoroutine(hitc.RemoveBlock(p));
-
-                        return;
+                        inChunkHit = false;
                     }
                 }
-
-
+                else
+                {
+                    inChunkHit = true;
+                }
 
 
                 // Remove Block
                 if (Input.GetMouseButtonDown(0))
                 {
-                    Vector3 hitPos = hit.point - hit.normal / 2.0f;
-                    Vector3 hitBlock = new Vector3(
-                        (int)(Mathf.Round(hitPos.x) - hit.collider.gameObject.transform.position.x),
-                        (int)(Mathf.Round(hitPos.y) - hit.collider.gameObject.transform.position.y),
-                        (int)(Mathf.Round(hitPos.z) - hit.collider.gameObject.transform.position.z));
+                    if (inChunkHit)
+                    {
+                        Vector3 hitPos = hit.point - hit.normal / 2.0f;
+                        Vector3 hitBlock = new Vector3(
+                            (int) (Mathf.Round(hitPos.x) - hit.collider.gameObject.transform.position.x),
+                            (int) (Mathf.Round(hitPos.y) - hit.collider.gameObject.transform.position.y),
+                            (int) (Mathf.Round(hitPos.z) - hit.collider.gameObject.transform.position.z));
 
-                    StaticWorld.Instance.StartCoroutine(hitc.RemoveBlock(hitBlock));
+                        StaticWorld.Instance.StartCoroutine(hitc.RemoveBlock(hitBlock));
+                    }
+                    else
+                    {
+                        Vector3 p = hit.collider.gameObject.transform.position - pos;
 
-
-
+                        StaticWorld.Instance.StartCoroutine(hitc.RemoveBlock(p));
+                    }
                 }
 
                 // Add Block
@@ -87,7 +95,8 @@ public class BlockInteraction : MonoBehaviour
 
                     if (block?.Type == BlockType.AIR)
                     {
-                        StaticWorld.Instance.StartCoroutine(hitc.AddBlock(hitBlock, this.blockType));
+                        //StaticWorld.Instance.StartCoroutine(hitc.AddBlock(hitBlock, this.blockType));
+                        StaticWorld.Instance.StartCoroutine(hitc.AddBlock(block,hitBlock, this.blockType));
                     }
                     else
                     {

@@ -99,11 +99,15 @@ namespace Assets.Scripts
             }
         }
 
-        public static Position GetChunkPosition(Vector3 blockPosition)
+        public static Vector3 GetChunkPosition(Vector3 blockPosition)
         {
-            Position chunkPos = new Position(blockPosition / World.chunkSize);
+            Vector3 chunkPosition = blockPosition / World.chunkSize;
+            chunkPosition.x = (int) chunkPosition.x;
+            chunkPosition.y = (int)chunkPosition.y;
+            chunkPosition.z = (int)chunkPosition.z;
+            chunkPosition *= World.chunkSize;
 
-            return chunkPos;
+            return chunkPosition;
         }
     }
 }
