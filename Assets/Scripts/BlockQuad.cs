@@ -10,13 +10,15 @@ namespace Assets.Scripts
 
         public GameObject QuadGameObject { get; set; }
 
-        public Vector3 Position { get; set; }
+        public Position Position { get; set; }
 
         public Transform ParrentTransform { get; set; }
 
         public MeshFilter MeshFilter { get; set; }
 
         public Mesh MeshCollider { get; set; }
+
+        private Transform Buffer => StaticWorld.Instance.WorldMeshBufferGameObject.transform;
 
         #region MyRegion
 
@@ -74,7 +76,7 @@ namespace Assets.Scripts
 
         #endregion
 
-        public BlockQuad(Cubeside cubeside, BlockType blockType, Transform parrentTransform, Vector3 position)
+        public BlockQuad(Cubeside cubeside, BlockType blockType, Transform parrentTransform, Position position)
         {
             this.BlockType = blockType;
             this.Cubeside = cubeside;
@@ -86,8 +88,11 @@ namespace Assets.Scripts
             this.MeshCollider = mesh;
 
             this.QuadGameObject = new GameObject("BlockQuad");
-            this.QuadGameObject.transform.position = this.Position;
-            this.QuadGameObject.transform.parent = this.ParrentTransform;
+
+            this.QuadGameObject.transform.localPosition = this.Position;
+            this.QuadGameObject.transform.parent = this.Buffer;
+            this.QuadGameObject.transform.localScale*=StaticWorld.K;
+           
 
             this.MeshFilter = (MeshFilter)this.QuadGameObject.AddComponent(typeof(MeshFilter));
             

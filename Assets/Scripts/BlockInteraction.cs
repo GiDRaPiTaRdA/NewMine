@@ -38,76 +38,103 @@ public class BlockInteraction : MonoBehaviour
             //for cross airs
             if (Physics.Raycast(this.cam.transform.position, this.cam.transform.forward, out RaycastHit hit, 10))
             {
-                bool inChunkHit;
+                hit.point = StaticWorld.Instance.gameObject.transform.InverseTransformPoint(hit.point);
+                hit.normal = StaticWorld.Instance.gameObject.transform.InverseTransformPoint(hit.normal+StaticWorld.Instance.gameObject.transform.position);
 
-                Vector3 pos = Vector3.zero;
+                bool inChunkHit = false;
 
-                // Find chunk by hit tranform
-                if (!StaticWorld.Instance.Chunks.TryGetValue(hit.collider.gameObject.transform.position, out Chunk hitc))
+                GameObject hitGameObject = hit.collider.gameObject;
+
+                Position? hitPosition = hitGameObject.GetComponent<ObjectPosition>()?.Position;
+
+                Chunk hitc = null;
+
+                if (hitPosition != null)
                 {
-                    // Find Chunk by block position
-                    pos = StaticWorld.GetChunkPosition(hit.collider.gameObject.transform.position);
+                    // Find chunk by hit tranform
+                    bool res = StaticWorld.Instance.Chunks.TryGetValue(hitPosition.Value, out hitc);
 
-                    if (!StaticWorld.Instance.Chunks.TryGetValue(pos, out hitc)) return;
+                    if (res)
                     {
-                        inChunkHit = false;
+                        inChunkHit = true;
+                    }
+                    else
+                    {
+                        // Find Chunk by block position
+                        //hitGameObject.transform.parent.GetComponent<Chunk>()
+
+                        ////Position pos = StaticWorld.GetChunkPosition(StaticWorld.Instance.gameObject.transform.InverseTransformPoint(hitGameObject.transform.position) / StaticWorld.K);
+
+                        StaticWorld.Instance.Chunks.TryGetValue(hitGameObject.transform.parent.GetComponent<ObjectPosition>().Position, out hitc);
                     }
                 }
-                else
+
+                if (hitPosition == null)
                 {
-                    inChunkHit = true;
+                    Debug.Log("Unknown object");
+                    return;
                 }
 
 
                 // Remove Block
                 if (Input.GetMouseButtonDown(0))
                 {
-                    if (inChunkHit)
-                    {
-                        Vector3 hitPos = hit.point - hit.normal / 2.0f;
-                        Vector3 hitBlock = new Vector3(
-                            (int) (Mathf.Round(hitPos.x) - hit.collider.gameObject.transform.position.x),
-                            (int) (Mathf.Round(hitPos.y) - hit.collider.gameObject.transform.position.y),
-                            (int) (Mathf.Round(hitPos.z) - hit.collider.gameObject.transform.position.z));
-
-                        StaticWorld.Instance.StartCoroutine(hitc.RemoveBlock(hitBlock));
-                    }
-                    else
-                    {
-                        Vector3 p = hit.collider.gameObject.transform.position - pos;
-
-                        StaticWorld.Instance.StartCoroutine(hitc.RemoveBlock(p));
-                    }
+                    this.RemoveBlock(hit, hitc, hitPosition.Value, inChunkHit);
                 }
 
                 // Add Block
                 else
                 {
-                    Vector3 hitPos = hit.point + hit.normal / 2.0f;
-
-                    Vector3 hitBlock = new Vector3(
-                        (int)(Mathf.Round(hitPos.x) - hit.collider.gameObject.transform.position.x),
-                        (int)(Mathf.Round(hitPos.y) - hit.collider.gameObject.transform.position.y),
-                        (int)(Mathf.Round(hitPos.z) - hit.collider.gameObject.transform.position.z));
-
-
-                    Block block = StaticWorld.GetWorldBlock(hitBlock + hitc.Position);
-
-                    if (block?.Type == BlockType.AIR)
-                    {
-                        //StaticWorld.Instance.StartCoroutine(hitc.AddBlock(hitBlock, this.blockType));
-                        StaticWorld.Instance.StartCoroutine(hitc.AddBlock(block,hitBlock, this.blockType));
-                    }
-                    else
-                    {
-                        Debug.Log("Can not add block here");
-                    }
-
+                    this.AddBlock(hit, hitc);
                 }
 
             }
         }
     }
+
+    private void AddBlock(RaycastHit hit, Chunk hitc)
+    {
+        Vector3 hitPos = hit.point + hit.normal * StaticWorld.K / 2.0f;
+
+        Position hitBlock = (Position)Round(hitPos / StaticWorld.K) - hitc.Position;
+
+        Block block = StaticWorld.GetWorldBlock(hitBlock + hitc.Position);
+
+
+        if (block?.Type == BlockType.AIR)
+        {
+            Debug.Log($"ADD Chunk {hitc.Position} Block {hitBlock} OLD {block.Type} NEW {this.blockType}");
+            StaticWorld.Instance.StartCoroutine(hitc.AddBlock(block, this.blockType));
+        }
+        else
+        {
+            Debug.Log("Can not add block here");
+        }
+    }
+
+    private void RemoveBlock(RaycastHit hit, Chunk hitc, Position hitBlockPosition, bool inChunkHit)
+    {
+        if (inChunkHit)
+        {
+            Vector3 hitPos = hit.point - hit.normal * StaticWorld.K / 2.0f;
+
+            hitBlockPosition = (Position)Round(hitPos / StaticWorld.K) - hitc.Position;
+
+            Debug.Log(hitBlockPosition);
+        }
+
+        Block b = hitc.ChunkData[hitBlockPosition];
+
+        Debug.Log($"REVOVE Chunk {hitc.Position} Block {hitBlockPosition} Type {b.Type}");
+
+        StaticWorld.Instance.StartCoroutine(hitc.RemoveBlock(b));
+        //StaticWorld.Instance.StartCoroutine(hitc.UpdateBlock(b, BlockType.AIR, hitBlockPosition));
+    }
+
+    private static Vector3 Round(Vector3 vector3) => new Vector3(
+        Mathf.Round(vector3.x),
+        Mathf.Round(vector3.y),
+        Mathf.Round(vector3.z));
 }
 
 

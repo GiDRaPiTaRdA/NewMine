@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using Assets;
 using Assets.Scripts;
+using Microsoft.Win32.SafeHandles;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 using Object = UnityEngine.Object;
@@ -18,10 +19,10 @@ public class Chunk
     public GameObject ChunkGameObject { get; set; }
     public Transform ChunkTransform => this.ChunkGameObject.transform;
 
-    public Vector3 Position { get; set; }
+    public Position Position { get; set; }
 
     public List<BlockQuad> MeshFiltersBlock { get; set; }
-    private static Vector3[] SideDirectionVectors => new[]
+    private static Position[] SideDirectionVectors => new Position[]
     {
         new Vector3(0, 0, -1),
         new Vector3(0, 0, 1),
@@ -88,6 +89,20 @@ public class Chunk
 
     #endregion
 
+
+
+    // Use this for initialization
+    public Chunk(Position position,Transform parrent)
+    {
+        this.ChunkGameObject = new GameObject(position.ToString());
+        this.ChunkGameObject.AddComponent<ObjectPosition>().Position = position;
+        this.ChunkGameObject.transform.parent = parrent;
+        this.ChunkGameObject.transform.localPosition = position*StaticWorld.K;
+        this.Position = position;
+        this.MeshFiltersBlock = new List<BlockQuad>();
+        this.BuildChunk();
+    }
+
     private void BuildChunk()
     {
         this.ChunkData = new ChunkData(new Block[World.chunkSize, World.chunkSize, World.chunkSize]);
@@ -96,13 +111,13 @@ public class Chunk
                 for (int x = 0; x < World.chunkSize; x++)
                 {
                     Vector3 pos = new Vector3(x, y, z);
-                    int worldX = (int)(x + this.ChunkTransform.position.x);
-                    int worldY = (int)(y + this.ChunkTransform.position.y);
-                    int worldZ = (int)(z + this.ChunkTransform.position.z);
+                    int worldX = (int)(x + this.Position.X);
+                    int worldY = (int)(y + this.Position.Y);
+                    int worldZ = (int)(z + this.Position.Z);
                     int surfaceHeight = Utils.GenerateHeight(worldX, worldZ);
                     //int surfaceHeight = StaticWorld.columnHeight * World.chunkSize;
 
-                    Transform chunkTransform = this.ChunkGameObject.gameObject.transform;
+                    //Transform chunkTransform = this.ChunkGameObject.gameObject.transform;
 
                     if (worldY == 0)
                     {
@@ -150,15 +165,130 @@ public class Chunk
         collider.sharedMesh = this.ChunkGameObject.transform.GetComponent<MeshFilter>().mesh;
     }
 
-    // Use this for initialization
-    public Chunk(Vector3 position)
+    private IEnumerator UpdateBlock(Block block, BlockType blockType)
     {
-        this.ChunkGameObject = new GameObject(position.ToString());
-        this.ChunkGameObject.transform.position = position;
-        this.Position = position;
-        this.MeshFiltersBlock = new List<BlockQuad>();
-        this.BuildChunk();
+        block.SetType(blockType);
+
+        block.Draw();
+
+        foreach (Position vector3 in SideDirectionVectors)
+        {
+            Position globalPos = vector3 + block.GlobalPosition;
+
+            if (this.IsInChunk(globalPos))
+            {
+                Position localPos = globalPos - this.Position;
+
+                this.ChunkData[localPos].Draw();
+            }
+            else
+            {
+                Block b = StaticWorld.GetWorldBlock(globalPos);
+                if (b != null)
+                {
+                    b.Draw();
+
+                    // todo do not update for all blocks
+                    b.Chunk.ReMeshFilter();
+                }
+                else
+                {
+                    Debug.Log("No such block to draw");
+                }
+            }
+        }
+
+        this.ReMeshFilter();
+
+        yield return null;
     }
+
+    //public IEnumerator UpdateBlock(Block block, BlockType blockType, Position position)
+    //{
+    //    block.SetType(blockType);
+
+    //    block.Draw();
+
+    //    foreach (Position vector3 in SideDirectionVectors)
+    //    {
+    //        Position globalPos = vector3 + block.Position + position;
+
+    //        if (this.IsInChunk(globalPos))
+    //        {
+    //            Position localPos = globalPos - this.Position;
+
+    //            this.ChunkData[localPos].Draw();
+    //        }
+    //        else
+    //        {
+    //            Block b = StaticWorld.GetWorldBlock(globalPos);
+    //            if (b != null)
+    //            {
+    //                b.Draw();
+
+    //                // todo do not update for all blocks
+    //                b.Chunk.ReMeshFilter();
+    //            }
+    //            else
+    //            {
+    //                Debug.Log("No such block to draw");
+    //            }
+    //        }
+    //    }
+
+    //    this.ReMeshFilter();
+
+    //    yield return null;
+    //}
+
+    //public IEnumerator RemoveBlock(Position position)
+    //{
+    //    Stopwatch s = Stopwatch.StartNew();
+
+    //    Block removeBlock = this.ChunkData[position];
+
+    //    removeBlock.SetType(BlockType.AIR);
+
+    //    removeBlock.Draw();
+
+
+    //    foreach (Vector3 vector3 in SideDirectionVectors)
+    //    {
+    //        Position globalPos = (Position)vector3 + position + this.Position;
+
+    //        if (this.IsInChunk(globalPos))
+    //        {
+    //            Vector3 localPos = (Position)vector3 + position;
+    //            this.ChunkData[localPos].Draw();
+    //        }
+    //        else
+    //        {
+    //            Block b = StaticWorld.GetWorldBlock(globalPos);
+    //            if (b != null)
+    //            {
+    //                b.Draw();
+
+    //                // todo do nor remesh filter for all blocks
+    //                b.Chunk.ReMeshFilter();
+    //            }
+    //            else
+    //            {
+    //                Debug.Log("No such block to remove");
+    //            }
+    //        }
+    //    }
+
+    //    this.ReMeshFilter();
+
+
+    //    s.Stop();
+    //    //Debug.Log(s.ElapsedMilliseconds);
+
+    //    yield return null;
+    //}
+
+    public IEnumerator AddBlock(Block block, BlockType blockType) => this.UpdateBlock(block, blockType);
+    public IEnumerator RemoveBlock(Block block) => this.UpdateBlock(block, BlockType.AIR);
 
     public void CombineQuads()
     {
@@ -195,7 +325,10 @@ public class Chunk
                 instance.mesh = blockQuad.MeshFilter.sharedMesh;
                 instance.transform = blockQuad.MeshFilter.transform.localToWorldMatrix;
 
-                CubeDescription cubeDescription = StaticWorld.Instance.CubeDescriptions[blockQuad.BlockType];
+
+
+
+                CubeDescription cubeDescription =  StaticWorld.Instance.CubeDescriptions[blockQuad.BlockType];
                 Material material = cubeDescription.CubeContent[blockQuad.Cubeside];
 
                 string key = material.name;
@@ -256,135 +389,17 @@ public class Chunk
 
         return mainMesh;
     }
-    public IEnumerator RemoveBlock(Vector3 position)
-    {
-        Stopwatch s = Stopwatch.StartNew();
 
-        Block removeBlock = this.ChunkData[position];
-
-        removeBlock.SetType(BlockType.AIR);
-
-        removeBlock.Draw();
-
-      
-        foreach (Vector3 vector3 in SideDirectionVectors)
-        {
-            Vector3 globalPos = vector3 + position + this.Position;
-
-            if (this.IsInChunk(globalPos))
-            {
-                Vector3 localPos = vector3 + position;
-                this.ChunkData[localPos].Draw();
-            }
-            else
-            {
-                Block b = StaticWorld.GetWorldBlock(globalPos);
-                if (b != null)
-                {
-                    b.Draw();
-
-                    // todo do nor remesh filter for all blocks
-                    b.Chunk.ReMeshFilter();
-                }
-                else
-                {
-                    Debug.Log("No such block to remove");
-                }
-            }
-        }
-
-        this.ReMeshFilter();
-
-
-        s.Stop();
-        //Debug.Log(s.ElapsedMilliseconds);
-
-        yield return null;
-    }
-
-    public IEnumerator AddBlock(Vector3 position, BlockType blockType)
-    {
-        Block addBlock = StaticWorld.GetWorldBlock(position + this.Position);
-
-        addBlock.SetType(blockType);
-
-        addBlock.Draw();
-
-        foreach (Vector3 vector3 in SideDirectionVectors)
-        {
-            Vector3 globalPos = vector3 + position + this.Position;
-
-            if (this.IsInChunk(globalPos))
-            {
-                Vector3 localPos = vector3 + position;
-                this.ChunkData[localPos].Draw();
-            }
-            else
-            {
-                Block b = StaticWorld.GetWorldBlock(globalPos);
-                if (b != null)
-                {
-                    b.Draw();
-                    b.Chunk.ReMeshFilter();
-                }
-                else
-                {
-                    Debug.Log("No such block to remove");
-                }
-            }
-        }
-
-        this.ReMeshFilter();
-
-        yield return null;
-    }
-
-    public IEnumerator AddBlock(Block addBlock,Vector3 position, BlockType blockType)
-    {
-        addBlock.SetType(blockType);
-
-        addBlock.Draw();
-
-        foreach (Vector3 vector3 in SideDirectionVectors)
-        {
-            Vector3 globalPos = vector3 + addBlock.GlobalPosition;
-
-            if (this.IsInChunk(globalPos))
-            {
-                Vector3 localPos = globalPos - this.Position;
-
-                this.ChunkData[localPos].Draw();
-            }
-            else
-            {
-                Block b = StaticWorld.GetWorldBlock(globalPos);
-                if (b != null)
-                {
-                    b.Draw();
-
-                    // todo do not update for all blocks
-                    b.Chunk.ReMeshFilter();
-                }
-                else
-                {
-                    Debug.Log("No such block to draw");
-                }
-            }
-        }
-
-        this.ReMeshFilter();
-
-        yield return null;
-    }
+   
 
     private bool IsInChunk(Vector3 vector)
     {
-        return vector.x >= 0 + this.Position.x &&
-               vector.y >= 0 + this.Position.y &&
-               vector.z >= 0 + this.Position.z &&
-               vector.x <= World.chunkSize - 1 + this.Position.x &&
-               vector.y <= World.chunkSize - 1 + this.Position.y &&
-               vector.z <= World.chunkSize - 1 + this.Position.z;
+        return vector.x >= 0 + this.Position.X &&
+               vector.y >= 0 + this.Position.Y &&
+               vector.z >= 0 + this.Position.Z &&
+               vector.x <= World.chunkSize - 1 + this.Position.X &&
+               vector.y <= World.chunkSize - 1 + this.Position.Y &&
+               vector.z <= World.chunkSize - 1 + this.Position.Z;
     }
 
     public void ReMeshFilter(List<BlockQuad> meshFilters = null)
@@ -396,19 +411,19 @@ public class Chunk
 
         Mesh mesh = this.ReMeshBase(meshFilters, out Material[] issuedMaterials);
 
-        this.ChunkGameObject.gameObject.GetComponent<MeshRenderer>().materials = issuedMaterials;
+        this.ChunkGameObject.GetComponent<MeshRenderer>().materials = issuedMaterials;
 
-        this.ChunkGameObject.gameObject.GetComponent<MeshFilter>().mesh = mesh;
+        this.ChunkGameObject.GetComponent<MeshFilter>().mesh = mesh;
 
         this.ChunkGameObject.GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
-    public void ReDrawChunk()
-    {
-        Object.DestroyImmediate(this.ChunkGameObject.GetComponent<MeshFilter>());
-        Object.DestroyImmediate(this.ChunkGameObject.GetComponent<MeshRenderer>());
-        Object.DestroyImmediate(this.ChunkGameObject.GetComponent<Collider>());
-        this.DrawChunk();
-    }
+    //public void ReDrawChunk()
+    //{
+    //    Object.DestroyImmediate(this.ChunkGameObject.GetComponent<MeshFilter>());
+    //    Object.DestroyImmediate(this.ChunkGameObject.GetComponent<MeshRenderer>());
+    //    Object.DestroyImmediate(this.ChunkGameObject.GetComponent<Collider>());
+    //    this.DrawChunk();
+    //}
 
 }

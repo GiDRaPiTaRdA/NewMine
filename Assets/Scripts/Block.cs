@@ -18,7 +18,7 @@ namespace Assets.Scripts
 
         private Transform ParentTransform => this.Chunk.ChunkGameObject.transform;
 
-        public Vector3 Position { get;}
+        public Position Position { get;}
         public Position GlobalPosition { get; }
 
         /// <summary>
@@ -61,6 +61,7 @@ namespace Assets.Scripts
                 tempGameObjects = new GameObject[0];
             }
 
+            // ADDITIONAL OBJECTS
             this.BlockObjects?.ToList().ForEach(Object.Destroy);
 
             this.BlockObjects = new GameObject[tempGameObjects.Length];
@@ -71,9 +72,12 @@ namespace Assets.Scripts
 
                 GameObject obj = Object.Instantiate(cubeGameObject);
                 obj.transform.position = this.Position;
-                obj.transform.SetParent(this.ParentTransform, false);
+                obj.AddComponent<ObjectPosition>().Position = this.Position;
 
-                Collider c = obj.GetComponentInChildren<Collider>();
+                obj.transform.position *= StaticWorld.K;
+                obj.transform.localScale *= StaticWorld.K;
+
+                obj.transform.SetParent(this.ParentTransform, false);
 
                 this.BlockObjects[index] = obj;
             }
@@ -82,17 +86,21 @@ namespace Assets.Scripts
 
         public bool HasSolidNeighbour(int x, int y, int z)
         {
-            Block[,,] chunks;
+            Block[,,] blocks;
 
             if (x < 0 || x >= World.chunkSize ||
                 y < 0 || y >= World.chunkSize ||
                 z < 0 || z >= World.chunkSize)
             {
                 //block in a neighbouring chunkGameObject
-                Vector3 neighbourChunkPos = this.ParentTransform.position +
-                                            new Vector3((x - (int)this.Position.x) * World.chunkSize,
-                                                (y - (int)this.Position.y) * World.chunkSize,
-                                                (z - (int)this.Position.z) * World.chunkSize);
+                //Vector3 neighbourChunkPos = this.Chunk.Position +
+                //                            new Position((x - (int)this.Position.X) * World.chunkSize,
+                //                                (y - (int)this.Position.Y) * World.chunkSize,
+                //                                (z - (int)this.Position.Z) * World.chunkSize);
+                Position pos = new Position(x, y, z);
+
+                ////block in a neighbouring chunkGameObject
+                Position neighbourChunkPos = this.Chunk.Position + ((pos - this.Position) * World.chunkSize);
 
                 x = World.ConvertBlockIndexToLocal(x);
                 y = World.ConvertBlockIndexToLocal(y);
@@ -100,19 +108,19 @@ namespace Assets.Scripts
 
                 if (StaticWorld.Instance.Chunks.TryGetValue(neighbourChunkPos, out Chunk nChunk))
                 {
-                    chunks = nChunk.ChunkData.chunkData;
+                    blocks = nChunk.ChunkData.chunkData;
                 }
                 else
                     return false;
             } //block in this chunkGameObject
             else
             {
-                chunks = this.Chunk.ChunkData.chunkData;
+                blocks = this.Chunk.ChunkData.chunkData;
             }
 
             try
             {
-                BlockKind neighbourKind = chunks[x, y, z].Kind;
+                BlockKind neighbourKind = blocks[x, y, z].Kind;
 
                 return neighbourKind == BlockKind.Solid ||
                       
@@ -126,11 +134,6 @@ namespace Assets.Scripts
             }
 
             return false;
-        }
-
-        public bool HasSolidNeighbour(Vector3 pos)
-        {
-            return this.HasSolidNeighbour(new Position((int)pos.x, (int)pos.y, (int)pos.z));
         }
 
         public bool HasSolidNeighbour(Position pos)
@@ -150,23 +153,23 @@ namespace Assets.Scripts
 
             if (this.Kind == BlockKind.Invisible) return;
 
-            if (!this.HasSolidNeighbour((int)this.Position.x, (int)this.Position.y, (int)this.Position.z + 1))
-                this.BlockQuads.Add(new BlockQuad(Cubeside.FRONT, this.Type, this.ParentTransform, this.Position));
+            if (!this.HasSolidNeighbour(this.Position.X, this.Position.Y, this.Position.Z + 1))
+                this.BlockQuads.Add(new BlockQuad(Cubeside.FRONT, this.Type, this.ParentTransform, this.Position*StaticWorld.K));
 
-            if (!this.HasSolidNeighbour((int)this.Position.x, (int)this.Position.y, (int)this.Position.z - 1))
-                this.BlockQuads.Add(new BlockQuad(Cubeside.BACK, this.Type, this.ParentTransform, this.Position));
+            if (!this.HasSolidNeighbour(this.Position.X, this.Position.Y, this.Position.Z - 1))
+                this.BlockQuads.Add(new BlockQuad(Cubeside.BACK, this.Type, this.ParentTransform,this.Position * StaticWorld.K));
 
-            if (!this.HasSolidNeighbour((int)this.Position.x, (int)this.Position.y + 1, (int)this.Position.z))
-                this.BlockQuads.Add(new BlockQuad(Cubeside.TOP, this.Type, this.ParentTransform, this.Position));
+            if (!this.HasSolidNeighbour(this.Position.X, this.Position.Y + 1, this.Position.Z))
+                this.BlockQuads.Add(new BlockQuad(Cubeside.TOP, this.Type, this.ParentTransform, this.Position * StaticWorld.K));
 
-            if (!this.HasSolidNeighbour((int)this.Position.x, (int)this.Position.y - 1, (int)this.Position.z))
-                this.BlockQuads.Add(new BlockQuad(Cubeside.BOTTOM, this.Type, this.ParentTransform, this.Position));
+            if (!this.HasSolidNeighbour(this.Position.X, this.Position.Y - 1, this.Position.Z))
+                this.BlockQuads.Add(new BlockQuad(Cubeside.BOTTOM, this.Type, this.ParentTransform, this.Position * StaticWorld.K));
 
-            if (!this.HasSolidNeighbour((int)this.Position.x - 1, (int)this.Position.y, (int)this.Position.z))
-                this.BlockQuads.Add(new BlockQuad(Cubeside.LEFT, this.Type, this.ParentTransform, this.Position));
+            if (!this.HasSolidNeighbour(this.Position.X - 1, this.Position.Y, this.Position.Z))
+                this.BlockQuads.Add(new BlockQuad(Cubeside.LEFT, this.Type, this.ParentTransform, this.Position * StaticWorld.K));
 
-            if (!this.HasSolidNeighbour((int)this.Position.x + 1, (int)this.Position.y, (int)this.Position.z))
-                this.BlockQuads.Add(new BlockQuad(Cubeside.RIGHT, this.Type, this.ParentTransform, this.Position));
+            if (!this.HasSolidNeighbour(this.Position.X + 1, this.Position.Y, this.Position.Z))
+                this.BlockQuads.Add(new BlockQuad(Cubeside.RIGHT, this.Type, this.ParentTransform, this.Position * StaticWorld.K));
 
             this.Chunk.MeshFiltersBlock.AddRange(this.BlockQuads);
         }

@@ -79,6 +79,7 @@
      <Compile Include="Assets\Scripts\GrassBlock.cs" />
      <Compile Include="Assets\Scripts\MeshCombines.cs" />
      <Compile Include="Assets\Scripts\MeshFilterMine.cs" />
+     <Compile Include="Assets\Scripts\ObjectPosition.cs" />
      <Compile Include="Assets\Scripts\Position.cs" />
      <Compile Include="Assets\Scripts\StaticWorld.cs" />
      <Compile Include="Assets\Scripts\StoneBlock.cs" />

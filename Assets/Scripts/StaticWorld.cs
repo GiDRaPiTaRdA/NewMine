@@ -22,13 +22,20 @@ namespace Assets.Scripts
         public int columnHeight = 4;
         public int worldSize = 1;
 
-        public Dictionary<Vector3, Chunk> Chunks { get; set; }
+
+        public float k = 1f;
+        public static float K => Instance.k;
+
+        public Dictionary<Position, Chunk> Chunks { get; set; }
+
+        public GameObject WorldMeshBufferGameObject { get; private set; }
 
         public static StaticWorld Instance { get; set; }
 
         public StaticWorld()
         {
             Instance = this;
+           
         }
 
         IEnumerator BuildWorld()
@@ -39,14 +46,15 @@ namespace Assets.Scripts
                 for (int x = 0; x < this.worldSize; x++)
                     for (int y = this.columnHeight; y >= 0; y--)
                     {
-                        Vector3 chunkPosition = new Vector3(x * World.chunkSize, y * World.chunkSize, z * World.chunkSize);
-                        Chunk c = new Chunk(chunkPosition);
-                        c.ChunkGameObject.transform.parent = this.transform;
+                        Position chunkPosition = new Position(x,y,z)*World.chunkSize;
 
-                        this.Chunks.Add(c.ChunkTransform.position, c);
+                        Chunk c = new Chunk(chunkPosition,this.transform);
+                      
+
+                        this.Chunks.Add(chunkPosition, c);
                     }
 
-            foreach (KeyValuePair<Vector3, Chunk> chunk in this.Chunks)
+            foreach (KeyValuePair<Position, Chunk> chunk in this.Chunks)
             {
                 chunk.Value.DrawChunk();
                 yield return null;
@@ -59,8 +67,9 @@ namespace Assets.Scripts
         // Use this for initialization
         void Start()
         {
-            this.Chunks = new Dictionary<Vector3, Chunk>();
-            this.transform.position = Vector3.zero;
+            this.WorldMeshBufferGameObject = new GameObject("WorldMeshBuffer");
+
+            this.Chunks = new Dictionary<Position, Chunk>();
             this.transform.rotation = Quaternion.identity;
             this.StartCoroutine(this.BuildWorld());
         }
@@ -102,7 +111,7 @@ namespace Assets.Scripts
         public static Vector3 GetChunkPosition(Vector3 blockPosition)
         {
             Vector3 chunkPosition = blockPosition / World.chunkSize;
-            chunkPosition.x = (int) chunkPosition.x;
+            chunkPosition.x = (int)chunkPosition.x;
             chunkPosition.y = (int)chunkPosition.y;
             chunkPosition.z = (int)chunkPosition.z;
             chunkPosition *= World.chunkSize;
