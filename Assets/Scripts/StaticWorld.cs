@@ -32,6 +32,8 @@ namespace Assets.Scripts
 
         public static StaticWorld Instance { get; set; }
 
+        public int loadingPercent = 0;
+
         public StaticWorld()
         {
             Instance = this;
@@ -42,6 +44,9 @@ namespace Assets.Scripts
         {
             Stopwatch s = Stopwatch.StartNew();
 
+            int count = 0;
+            int totalChunks = this.worldSize * this.worldSize * this.columnHeight;
+
             for (int z = 0; z < this.worldSize; z++)
                 for (int x = 0; x < this.worldSize; x++)
                     for (int y = this.columnHeight; y >= 0; y--)
@@ -50,13 +55,14 @@ namespace Assets.Scripts
 
                         Chunk c = new Chunk(chunkPosition,this.transform);
                       
-
                         this.Chunks.Add(chunkPosition, c);
                     }
 
             foreach (KeyValuePair<Position, Chunk> chunk in this.Chunks)
             {
                 chunk.Value.DrawChunk();
+                count++;
+                this.loadingPercent = (int) (((float)count / (float)totalChunks) * 100);
                 yield return null;
             }
 

@@ -1,4 +1,5 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 using UnityStandardAssets.CrossPlatformInput;
 using UnityStandardAssets.Utility;
@@ -28,6 +29,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
         [SerializeField] private AudioClip m_JumpSound;           // the sound played when character leaves the ground.
         [SerializeField] private AudioClip m_LandSound;           // the sound played when character touches back on ground.
 
+        public bool IsJumping => this.m_Jumping;
+        public Vector3 MoveDirection => this.m_MoveDir;
+        public Vector3 MoveDirection2D => new Vector3(this.MoveDirection.x,0,this.MoveDirection.z);
+
         private Camera m_Camera;
         private bool m_Jump;
         private float m_YRotation;
@@ -41,7 +46,7 @@ namespace UnityStandardAssets.Characters.FirstPerson
         private float m_NextStep;
         private bool m_Jumping;
         private AudioSource m_AudioSource;
-
+        
         // Use this for initialization
         private void Start()
         {
@@ -55,6 +60,10 @@ namespace UnityStandardAssets.Characters.FirstPerson
             m_Jumping = false;
             m_AudioSource = GetComponent<AudioSource>();
 			m_MouseLook.Init(transform , m_Camera.transform);
+
+#if MOBILE_INPUT
+            m_MouseLook.lockCursor = false;
+#endif
         }
 
 
@@ -233,27 +242,30 @@ namespace UnityStandardAssets.Characters.FirstPerson
             }
         }
 
+        public void Jump()
+        {
+            this.m_Jump = true;
+        }
 
         private void RotateView()
         {
             m_MouseLook.LookRotation (transform, m_Camera.transform);
         }
 
-
-        private void OnControllerColliderHit(ControllerColliderHit hit)
+        private void CheckEnableControlRig()
         {
-            Rigidbody body = hit.collider.attachedRigidbody;
-            //dont move the rigidbody if the character is on top of it
-            if (m_CollisionFlags == CollisionFlags.Below)
-            {
-                return;
-            }
+#if MOBILE_INPUT
+		EnableControlRig(false);
+#else
+            EnableControlRig(true);
+#endif
+        }
 
-            if (body == null || body.isKinematic)
-            {
-                return;
-            }
-            body.AddForceAtPosition(m_CharacterController.velocity*0.1f, hit.point, ForceMode.Impulse);
+
+        private void EnableControlRig(bool enabled)
+        {
+            this?.m_MouseLook?.SetCursorLock(enabled);
+           
         }
     }
 }

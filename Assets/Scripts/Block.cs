@@ -33,11 +33,11 @@ namespace Assets.Scripts
 
         public Block(BlockType blockType, Vector3 pos, Chunk chunk)
         {
-            this.SetType(blockType);
             this.Chunk = chunk;
             this.Position = pos;
             this.GlobalPosition = this.Position + this.Chunk.Position;
             this.BlockQuads = new List<BlockQuad>(6);
+            this.SetType(blockType);
         }
 
         public void SetType(BlockType b)

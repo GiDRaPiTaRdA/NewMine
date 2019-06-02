@@ -121,7 +121,7 @@ public class Chunk
 
                     if (worldY == 0)
                     {
-                        this.ChunkData[x, y, z] = new Block(BlockType.DIRT, pos, this);
+                        this.ChunkData[x, y, z] = new Block(BlockType.COBBLESTONE, pos, this);
                     }
                     else if (Utils.fBM3D(worldX, worldY, worldZ, 0.1f, 3) < 0.42f)
                     {
@@ -131,6 +131,24 @@ public class Chunk
                     else if (worldY <= Utils.GenerateStoneHeight(worldX, worldZ))
                     {
                         this.ChunkData[x, y, z] = new Block(BlockType.STONE, pos, this);
+                    }
+                    else if (worldY == surfaceHeight+1)
+                    {
+                        float tallGrass = 0.4f;
+                        float flower = 0.6f;
+
+                        if (Mathf.PerlinNoise(worldX * tallGrass, worldZ * tallGrass) > 0.6f)
+                        {
+                            this.ChunkData[x, y, z] = new Block(BlockType.TALLGRASS, pos, this);
+                        }
+                        else if (Mathf.PerlinNoise(worldX * flower, worldZ * flower) > 0.8f)
+                        {
+                            this.ChunkData[x, y, z] = new Block(BlockType.FLOVER, pos, this);
+                        }
+                        else
+                        {
+                            this.ChunkData[x, y, z] = new Block(BlockType.AIR, pos, this);
+                        }
                     }
                     else if (worldY == surfaceHeight)
                     {
@@ -304,9 +322,9 @@ public class Chunk
         renderer.materials = issuedMaterials;
 
         ////5. Delete all uncombined children
-        foreach (Transform quad in this.ChunkGameObject.transform)
+        foreach (BlockQuad quad in this.MeshFiltersBlock)
         {
-            quad.gameObject.SetActive(false);
+            quad.QuadGameObject.SetActive(false);
         }
 
     }

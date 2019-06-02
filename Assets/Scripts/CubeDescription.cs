@@ -12,6 +12,8 @@ public class CubeDescription : MonoBehaviour
 
     public GameObject[] cubeGameObjects;
 
+    public Material previewMaterial;
+
     private Dictionary<Cubeside, Material> cubeContent;
 
     public Dictionary<Cubeside, Material> CubeContent =>
@@ -21,8 +23,10 @@ public class CubeDescription : MonoBehaviour
     {
         Material[] materials = this.GetComponentsInChildren<MeshRenderer>().Select(mr => mr.sharedMaterial).ToArray();
 
-        Dictionary<Cubeside, Material> cont;
+        Dictionary<Cubeside, Material> cont = null;
 
+        if (materials.Length == 6)
+        {
             cont = new Dictionary<Cubeside, Material>(6)
             {
                 {Cubeside.TOP, materials[0]},
@@ -32,8 +36,8 @@ public class CubeDescription : MonoBehaviour
                 {Cubeside.FRONT, materials[4]},
                 {Cubeside.BACK, materials[5]},
             };
-        
-      
+        }
+
 
         return cont;
     }

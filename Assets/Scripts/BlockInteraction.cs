@@ -1,7 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Assets.Scripts;
 using UnityEngine;
+using UnityStandardAssets.CrossPlatformInput;
 
 public class BlockInteraction : MonoBehaviour
 {
@@ -33,7 +37,25 @@ public class BlockInteraction : MonoBehaviour
 
     private void MouseInputs()
     {
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1))
+        bool addBlock;
+        bool removeBlock;
+        bool shareBlock;
+        bool blockChange = false;
+
+#if UNITY_STANDALONE_WIN
+        addBlock = Input.GetMouseButtonDown(1);
+        removeBlock = Input.GetMouseButtonDown(0);
+        shareBlock = Input.GetMouseButtonDown(2);
+       // blockChange = CrossPlatformInputManager.GetButtonDown("BlockChange");
+#elif MOBILE_INPUT
+        addBlock = CrossPlatformInputManager.GetButtonDown("Add");
+        removeBlock = CrossPlatformInputManager.GetButtonDown("Remove");
+        shareBlock = CrossPlatformInputManager.GetButtonDown("Share");
+        blockChange = CrossPlatformInputManager.GetButtonDown("BlockChange");
+#endif
+
+
+        if (addBlock || removeBlock || shareBlock)
         {
             //for cross airs
             if (Physics.Raycast(this.cam.transform.position, this.cam.transform.forward, out RaycastHit hit, 10))
@@ -77,18 +99,29 @@ public class BlockInteraction : MonoBehaviour
 
 
                 // Remove Block
-                if (Input.GetMouseButtonDown(0))
+                if (removeBlock)
                 {
                     this.RemoveBlock(hit, hitc, hitPosition.Value, inChunkHit);
                 }
-
                 // Add Block
-                else
+                else if(addBlock)
                 {
                     this.AddBlock(hit, hitc);
                 }
+                else if(shareBlock)
+                {
+                    this.ShareBlock(hit, hitc, hitPosition.Value, inChunkHit);
+                }
 
             }
+        }
+
+        if (blockChange)
+        {
+            if ((int) this.blockType != 11)
+                this.blockType += 1;
+            else
+                this.blockType = BlockType.GRASS;
         }
     }
 
@@ -119,8 +152,6 @@ public class BlockInteraction : MonoBehaviour
             Vector3 hitPos = hit.point - hit.normal * StaticWorld.K / 2.0f;
 
             hitBlockPosition = (Position)Round(hitPos / StaticWorld.K) - hitc.Position;
-
-            Debug.Log(hitBlockPosition);
         }
 
         Block b = hitc.ChunkData[hitBlockPosition];
@@ -128,6 +159,24 @@ public class BlockInteraction : MonoBehaviour
         Debug.Log($"REVOVE Chunk {hitc.Position} Block {hitBlockPosition} Type {b.Type}");
 
         StaticWorld.Instance.StartCoroutine(hitc.RemoveBlock(b));
+    }
+
+    private void ShareBlock(RaycastHit hit, Chunk hitc, Position hitBlockPosition, bool inChunkHit)
+    {
+        if (inChunkHit)
+        {
+            Vector3 hitPos = hit.point - hit.normal * StaticWorld.K / 2.0f;
+
+            hitBlockPosition = (Position)Round(hitPos / StaticWorld.K) - hitc.Position;
+
+            Debug.Log(hitBlockPosition);
+        }
+
+        Block b = hitc.ChunkData[hitBlockPosition];
+
+        Debug.Log($"SHARE Chunk {hitc.Position} Block {hitBlockPosition} Type {b.Type}");
+
+        this.blockType = b.Type;
         //StaticWorld.Instance.StartCoroutine(hitc.UpdateBlock(b, BlockType.AIR, hitBlockPosition));
     }
 

@@ -39,7 +39,7 @@ public class Utils {
         return Mathf.Lerp (newmin, newmax, Mathf.InverseLerp (origmin, origmax, value));
     }
 
-    static float fBM(float x, float z, int oct, float pers)
+    public static float fBM(float x, float z, int oct, float pers)
     {
         float total = 0;
         float frequency = 1;

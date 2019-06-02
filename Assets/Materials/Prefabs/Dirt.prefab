@@ -438,6 +438,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   blockType: 1
+  blockKind: 0
+  cubeGameObjects: []
+  previewMaterial: {fileID: 2100000, guid: 0aac845fad616934aa95bb6328326be7, type: 2}
 --- !u!1 &7284444918052353577
 GameObject:
   m_ObjectHideFlags: 0

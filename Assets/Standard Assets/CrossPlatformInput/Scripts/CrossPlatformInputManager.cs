@@ -314,5 +314,33 @@ namespace UnityStandardAssets.CrossPlatformInput
 				}
 			}
 		}
+
+	    public class VirtualToggle
+	    {
+            public bool IsToggled { get; set; }
+
+
+	        public string Name { get; private set; }
+	     
+
+	        public VirtualToggle(string name)
+	        {
+	            this.Name = name;
+	        }
+
+	        public void SetToggled(bool value)
+	        {
+	            this.IsToggled = value;
+	        }
+
+	        // the controller gameobject should call Remove when the button is destroyed or disabled
+	        public void Remove()
+	        {
+	            UnRegisterVirtualButton(this.Name);
+	        }
+
+
+	
+        }
 	}
 }

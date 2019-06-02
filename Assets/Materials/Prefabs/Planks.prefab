@@ -537,6 +537,7 @@ MonoBehaviour:
   blockType: 6
   blockKind: 0
   cubeGameObjects: []
+  previewMaterial: {fileID: 2100000, guid: fd01d85379404e64585704c6df186035, type: 2}
 --- !u!1 &9043132798806516470
 GameObject:
   m_ObjectHideFlags: 0

@@ -160,6 +160,7 @@ MonoBehaviour:
   blockKind: 4
   cubeGameObjects:
   - {fileID: 1382919243093450452}
+  previewMaterial: {fileID: 2100000, guid: cc707481f8f79234ea40ea8a9fd6a932, type: 2}
 --- !u!1 &3395639701079911758
 GameObject:
   m_ObjectHideFlags: 0
