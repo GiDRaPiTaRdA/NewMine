@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/SampleScene.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 1
-    path: Assets/NewMine.unity
+    path: Assets/Scenes/Menu.unity
+    guid: 4ada1840809234a47830738e59aadf20
+  - enabled: 1
+    path: Assets/Scenes/NewMine.unity
     guid: 21cd81215753207499f781faa9b5ef6f
   m_configObjects: {}

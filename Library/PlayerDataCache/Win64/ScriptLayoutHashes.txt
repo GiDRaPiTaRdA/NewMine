@@ -2,7 +2,7 @@ Win64
 PlayerPath?
 C:/Users/Maxim/Desktop/Новая папка (2)/NewMine.exe
 SceneListBegin?
-Assets/NewMine.unity
+Assets/Scenes/NewMine.unity
 SceneListEnd?
 b48c8d99d321541a536d9c6093f31c5d Assembly-CSharp.dll:.Player3DExample
 984dcc0ba3707b7691fbdca8ff508d28 Unity.TextMeshPro.dll:TMPro.TMP_SelectionCaret

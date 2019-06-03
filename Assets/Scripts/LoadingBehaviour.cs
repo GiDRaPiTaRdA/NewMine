@@ -8,16 +8,11 @@ public class LoadingBehaviour : MonoBehaviour
 {
 
     public Slider slider;
-    public Button button;
+    public GameObject fpsController;
 
     // Start is called before the first frame update
     void Start()
     {
-    }
-
-    public void OnStartButtonClick()
-    {
-        this.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -27,15 +22,10 @@ public class LoadingBehaviour : MonoBehaviour
         {
             this.slider.value = StaticWorld.Instance.loadingPercent;
         }
-        else if(!this.button.IsActive())
+        else
         {
-#if UNITY_STANDALONE_WIN
             this.gameObject.SetActive(false);
-#elif MOBILE_INPUT
-            this.button.gameObject.SetActive(true);
-#endif
-
-
+            fpsController.SetActive(true);
         }
     }
 }
