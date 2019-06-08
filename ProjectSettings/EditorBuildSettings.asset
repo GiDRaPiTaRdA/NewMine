@@ -6,12 +6,18 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 99c9720ab356a0642a771bea13969a05
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
-    path: Assets/Scenes/Menu.unity
+    path: Assets/Minecraft/Scenes/Menu.unity
     guid: 4ada1840809234a47830738e59aadf20
   - enabled: 1
-    path: Assets/Scenes/NewMine.unity
+    path: Assets/Minecraft/Scenes/FPSMinecraft.unity
     guid: 21cd81215753207499f781faa9b5ef6f
+  - enabled: 1
+    path: Assets/Minecraft/Scenes/ARCore.unity
+    guid: 3f387327b284d1d4185afdb76c3d3144
+  - enabled: 0
+    path: Assets/AR/Scenes/New Scene.unity
+    guid: 892a08f6896bb704a8811334af72e27b
   m_configObjects: {}

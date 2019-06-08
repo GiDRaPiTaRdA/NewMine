@@ -569,3 +569,5 @@ C:\Users\Maxim\source\repos\NewMineDynamic\Temp\bin\Debug\Vuforia.UnityExtension
 C:\Users\Maxim\source\repos\NewMineDynamic\Temp\bin\Debug\UnityEngine.GoogleAudioSpatializer.xml
 C:\Users\Maxim\source\repos\NewMineDynamic\Temp\bin\Debug\UnityEngine.SpatialTracking.xml
 C:\Users\Maxim\source\repos\NewMineDynamic\obj\Debug\Assembly-CSharp.csproj.CopyComplete
+C:\Users\Maxim\source\repos\NewMineDynamic\Temp\bin\Debug\UnityEngine.SpatialTrackingModule.dll
+C:\Users\Maxim\source\repos\NewMineDynamic\Temp\bin\Debug\UnityEngine.SpatialTrackingModule.xml
