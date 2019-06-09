@@ -276,7 +276,6 @@ C:\Users\Maxim\source\repos\NewMine\obj\Debug\Assembly-CSharp.csproj.CopyComplet
 C:\Users\Maxim\source\repos\NewMine\obj\Debug\Assembly-CSharp.dll
 C:\Users\Maxim\source\repos\NewMine\obj\Debug\Assembly-CSharp.pdb
 C:\Users\Maxim\source\repos\NewMine\Temp\bin\Debug\Unity.TextMeshPro.Editor.dll
-C:\Users\Maxim\source\repos\NewMineDynamic\obj\Debug\Assembly-CSharp.csprojAssemblyReference.cache
 C:\Users\Maxim\source\repos\NewMineDynamic\obj\Debug\Assembly-CSharp.csproj.CoreCompileInputs.cache
 C:\Users\Maxim\source\repos\NewMineDynamic\obj\Debug\Assembly-CSharp.dll
 C:\Users\Maxim\source\repos\NewMineDynamic\obj\Debug\Assembly-CSharp.pdb

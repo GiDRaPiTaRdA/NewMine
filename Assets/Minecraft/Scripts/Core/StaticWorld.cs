@@ -16,7 +16,7 @@ namespace Assets.Scripts
 
         private Dictionary<BlockType, CubeDescription> cubeDescriptions;
 
-       
+        
 
         public Dictionary<BlockType, CubeDescription> CubeDescriptions => this.cubeDescriptions ??
                                                             (this.cubeDescriptions = this.container.cubeDescriptions.ToDictionary(d => d.blockType, d => d));
@@ -107,7 +107,11 @@ namespace Assets.Scripts
                 Stopwatch a = Stopwatch.StartNew();
                 WorldData data = null;
 
-                data = SaveManager.Instance.LoadData("Default");
+#if UNITY_EDITOR
+                SaveManager.Instance.SelectedSave = SaveManager.Instance.LoadSaves().First();
+#endif
+                
+                data = SaveManager.Instance.LoadData();
 
                 Debug.Log("LoadData "+ a.ElapsedMilliseconds);
 

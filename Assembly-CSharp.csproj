@@ -148,8 +148,6 @@
     <Compile Include="Assets\GoogleARCore\SDK\Scripts\Utility\ConversionHelper.cs" />
     <Compile Include="Assets\GoogleARCore\SDK\Scripts\Utility\IntPtrEqualityComparer.cs" />
     <Compile Include="Assets\GoogleARCore\SDK\Scripts\Utility\MarshalingHelper.cs" />
-    <Compile Include="Assets\MenuScript.cs" />
-    <Compile Include="Assets\Minecraft\FpsMinecraftInputs.cs" />
     <Compile Include="Assets\Minecraft\InputManager.cs" />
     <Compile Include="Assets\Minecraft\Scripts\Core\Block.cs" />
     <Compile Include="Assets\Minecraft\Scripts\Core\BlockBuilder.cs" />
@@ -185,6 +183,11 @@
     <Compile Include="Assets\Minecraft\Scripts\UI\PlatformTarget.cs" />
     <Compile Include="Assets\Minecraft\Scripts\UI\PlatformUpdate.cs" />
     <Compile Include="Assets\Minecraft\Scripts\UI\RotationScript.cs" />
+    <Compile Include="Assets\Minecraft\UI\UIScripts\EditBox.cs" />
+    <Compile Include="Assets\Minecraft\UI\UIScripts\ListItemScript.cs" />
+    <Compile Include="Assets\Minecraft\UI\UIScripts\ListScript.cs" />
+    <Compile Include="Assets\Minecraft\UI\UIScripts\MenuScript.cs" />
+    <Compile Include="Assets\Minecraft\UI\UIScripts\SelectWorld.cs" />
     <Compile Include="Assets\Minecraft\UI\UIScripts\ToggleScript.cs" />
     <Compile Include="Assets\packages\Kino\Motion\Motion.cs" />
     <Compile Include="Assets\packages\Kino\Motion\Script\FrameBlendingFilter.cs" />
@@ -237,7 +240,6 @@
     <Compile Include="Assets\packages\Virtual Joystick Pack\Scripts\Joysticks\FixedJoystick.cs" />
     <Compile Include="Assets\packages\Virtual Joystick Pack\Scripts\Joysticks\FloatingJoystick.cs" />
     <Compile Include="Assets\packages\Virtual Joystick Pack\Scripts\Joysticks\VariableJoystick.cs" />
-    <Compile Include="Assets\SceneLoader.cs" />
     <None Include="Assets\AR\Materials\Shaders\PlaneGrid.shader" />
     <None Include="Assets\Minecraft\Shaiders\Effect\MKGlowSM25.shader" />
     <None Include="Assets\packages\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />

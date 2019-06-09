@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 using Assets;
@@ -13,14 +14,22 @@ using Debug = UnityEngine.Debug;
 
 public class SaveManager
 {
+    public string SelectedSave { get; set; } = null;
+
+    public string SelectedSaveFullPath => this.GetSavePath(this.SelectedSave);
+
+    public string Extention { get; } = "save";
+
     public string DirPath { get; } = Application.persistentDataPath + "/saves";
 
-    public string GetSavePath(string saveName) => $"{this.DirPath}/{saveName}.save";
+    public string GetSavePath(string saveName) => $"{this.DirPath}/{saveName}.{this.Extention}";
 
     private static SaveManager instance;
     public static SaveManager Instance => instance ?? (instance = new SaveManager());
 
-    public void SaveData(StaticWorld world, string saveName)
+    //// SAVE
+    public void SaveData(StaticWorld world) => this.SaveData(world, this.SelectedSaveFullPath);
+    public void SaveData(StaticWorld world, string savePath)
     {
         Stopwatch s = Stopwatch.StartNew();
 
@@ -46,28 +55,27 @@ public class SaveManager
 
         Debug.Log("Parse " + s.ElapsedMilliseconds);
 
-        this.SaveData(data, saveName);
+        this.SaveData(data, savePath);
 
         Debug.Log("Save " + s.ElapsedMilliseconds);
     }
-
-    public void SaveData(WorldData data, string saveName)
+    public void SaveData(WorldData data, string savePath)
     {
         if (!Directory.Exists(this.DirPath))
             Directory.CreateDirectory(this.DirPath);
 
-        using (FileStream stream = new FileStream(this.GetSavePath(saveName), FileMode.Create))
+        using (FileStream stream = new FileStream(savePath, FileMode.Create))
         {
             XmlSerializer binaryFormatter = new XmlSerializer(typeof(WorldData));
             binaryFormatter.Serialize(stream, data);
         }
     }
 
-    public WorldData LoadData(string saveName)
+    //// LOAD
+    public WorldData LoadData()=> this.LoadData(this.SelectedSaveFullPath);
+    public WorldData LoadData(string savePath)
     {
         WorldData data = null;
-
-        string savePath = this.GetSavePath(saveName);
 
         if (File.Exists(savePath))
         {
@@ -84,31 +92,27 @@ public class SaveManager
 
         return data;
     }
+
+    //// LOAD MANY
+    public string[] LoadSaves() => this.LoadSaves(this.DirPath);
+    public string[] LoadSaves(string dir)
+    {
+        string[] saves = null;
+
+
+        if (Directory.Exists(dir))
+        {
+            //$".{this.Extention}"
+            saves = Directory.GetFiles(dir+"/").Select(Path.GetFileNameWithoutExtension).ToArray();
+        }
+        else
+        {
+            Debug.LogError("No directory " + dir);
+        }
+
+        return saves;
+    }
 }
-
-//public class SerializablePosition
-//{
-//    public SerializablePosition(Position position)
-//    {
-//        this.X = position.X;
-//        this.Y = position.Y;
-//        this.Z = position.Z;
-//    }
-
-//    public int X { get; set; }
-//    public int Y { get; set; }
-//    public int Z { get; set; }
-
-//    public static implicit operator Position(SerializablePosition rValue)
-//    {
-//        return new Position(rValue.X, rValue.Y, rValue.Z);
-//    }
-
-//    public static implicit operator SerializablePosition(Position rValue)
-//    {
-//        return new SerializablePosition(rValue);
-//    }
-//}
 
 [Serializable]
 public class WorldData
