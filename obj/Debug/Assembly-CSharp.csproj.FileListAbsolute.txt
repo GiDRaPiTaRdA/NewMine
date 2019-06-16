@@ -570,3 +570,6 @@ C:\Users\Maxim\source\repos\NewMineDynamic\Temp\bin\Debug\UnityEngine.SpatialTra
 C:\Users\Maxim\source\repos\NewMineDynamic\obj\Debug\Assembly-CSharp.csproj.CopyComplete
 C:\Users\Maxim\source\repos\NewMineDynamic\Temp\bin\Debug\UnityEngine.SpatialTrackingModule.dll
 C:\Users\Maxim\source\repos\NewMineDynamic\Temp\bin\Debug\UnityEngine.SpatialTrackingModule.xml
+C:\Users\Maxim\source\repos\NewMineDynamic\obj\Debug\Assembly-CSharp.csprojAssemblyReference.cache
+C:\Users\Maxim\source\repos\NewMineDynamic\Temp\bin\Debug\UnityEditor.UI.dll
+C:\Users\Maxim\source\repos\NewMineDynamic\Temp\bin\Debug\UnityEditor.UI.xml

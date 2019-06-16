@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/Minecraft/Scenes/FPSMinecraft.unity
+- path: Assets/Minecraft/Scenes/Menu.unity
   isLoaded: 1
   isActive: 1

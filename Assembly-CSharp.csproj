@@ -60,6 +60,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\AcceptScript.cs" />
     <Compile Include="Assets\AR\Scripts\ARController.cs" />
     <Compile Include="Assets\AR\Scripts\ArPlanesContoller.cs" />
     <Compile Include="Assets\AR\Scripts\ArUiScript.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Assets\AR\Scripts\PointcloudVisualizer.cs" />
     <Compile Include="Assets\AR\Scripts\Scaling.cs" />
     <Compile Include="Assets\AR\Scripts\TrackedPlaneVisualizer.cs" />
+    <Compile Include="Assets\EditTextScript.cs" />
     <Compile Include="Assets\GoogleARCore\SDK\InstantPreview\Scripts\InstantPreviewInput.cs" />
     <Compile Include="Assets\GoogleARCore\SDK\InstantPreview\Scripts\InstantPreviewManager.cs" />
     <Compile Include="Assets\GoogleARCore\SDK\InstantPreview\Scripts\InstantPreviewTrackedPoseDriver.cs" />
@@ -171,6 +173,7 @@
     <Compile Include="Assets\Minecraft\Scripts\Core\StaticWorld.cs" />
     <Compile Include="Assets\Minecraft\Scripts\Core\Utils.cs" />
     <Compile Include="Assets\Minecraft\Scripts\Core\World.cs" />
+    <Compile Include="Assets\Minecraft\Scripts\Data\GameData.cs" />
     <Compile Include="Assets\Minecraft\Scripts\Data\SaveManager.cs" />
     <Compile Include="Assets\Minecraft\Scripts\GameManager.cs" />
     <Compile Include="Assets\Minecraft\Scripts\Player\AutoJump.cs" />
@@ -183,11 +186,11 @@
     <Compile Include="Assets\Minecraft\Scripts\UI\PlatformTarget.cs" />
     <Compile Include="Assets\Minecraft\Scripts\UI\PlatformUpdate.cs" />
     <Compile Include="Assets\Minecraft\Scripts\UI\RotationScript.cs" />
+    <Compile Include="Assets\Minecraft\UI\MainMenu\ChooseWorldBehaviour.cs" />
+    <Compile Include="Assets\Minecraft\UI\MainMenu\ListItemScript.cs" />
+    <Compile Include="Assets\Minecraft\UI\MainMenu\ListScript.cs" />
     <Compile Include="Assets\Minecraft\UI\UIScripts\EditBox.cs" />
-    <Compile Include="Assets\Minecraft\UI\UIScripts\ListItemScript.cs" />
-    <Compile Include="Assets\Minecraft\UI\UIScripts\ListScript.cs" />
     <Compile Include="Assets\Minecraft\UI\UIScripts\MenuScript.cs" />
-    <Compile Include="Assets\Minecraft\UI\UIScripts\SelectWorld.cs" />
     <Compile Include="Assets\Minecraft\UI\UIScripts\ToggleScript.cs" />
     <Compile Include="Assets\packages\Kino\Motion\Motion.cs" />
     <Compile Include="Assets\packages\Kino\Motion\Script\FrameBlendingFilter.cs" />
@@ -240,6 +243,8 @@
     <Compile Include="Assets\packages\Virtual Joystick Pack\Scripts\Joysticks\FixedJoystick.cs" />
     <Compile Include="Assets\packages\Virtual Joystick Pack\Scripts\Joysticks\FloatingJoystick.cs" />
     <Compile Include="Assets\packages\Virtual Joystick Pack\Scripts\Joysticks\VariableJoystick.cs" />
+    <Compile Include="Assets\PopUpManager.cs" />
+    <Compile Include="Assets\UnityEvents.cs" />
     <None Include="Assets\AR\Materials\Shaders\PlaneGrid.shader" />
     <None Include="Assets\Minecraft\Shaiders\Effect\MKGlowSM25.shader" />
     <None Include="Assets\packages\TextMesh Pro\Resources\Shaders\TMP_SDF-Surface-Mobile.shader" />

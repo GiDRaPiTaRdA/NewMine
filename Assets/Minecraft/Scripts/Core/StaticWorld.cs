@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Assets.Minecraft.Scripts.Data;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -104,16 +105,20 @@ namespace Assets.Scripts
 
             IEnumerator Load()
             {
-                Stopwatch a = Stopwatch.StartNew();
+               
                 WorldData data = null;
 
-#if UNITY_EDITOR
-                SaveManager.Instance.SelectedSave = SaveManager.Instance.LoadSaves().First();
-#endif
-                
-                data = SaveManager.Instance.LoadData();
+                if (GameData.LoadMode.Value == LoadMode.Load)
+                {
+                    Stopwatch a = Stopwatch.StartNew();
+                    data = SaveManager.Instance.LoadData();
+                    Debug.Log("LoadData " + a.ElapsedMilliseconds);
 
-                Debug.Log("LoadData "+ a.ElapsedMilliseconds);
+                    if (data == null)
+                    {
+                        Debug.LogError("Load Faluire");
+                    }
+                }
 
                 return this.BuildWorld(data);
             }

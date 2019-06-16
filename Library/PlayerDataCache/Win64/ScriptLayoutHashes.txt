@@ -1,6 +1,6 @@
 Win64
 PlayerPath?
-C:/Users/Maxim/Desktop/Новая папка (2)/NewMine.exe
+C:/Users/Maxim/Desktop/Новая папка (4)/NewMine.exe
 SceneListBegin?
 Assets/Minecraft/Scenes/Menu.unity
 Assets/Minecraft/Scenes/FPSMinecraft.unity
@@ -24,6 +24,7 @@ e1bbf0ab858085e38fae6b12ebbdcd35 UnityEngine.Timeline.dll:UnityEngine.Timeline.G
 e1bbf0ab858085e38fae6b12ebbdcd35 UnityEngine.Timeline.dll:UnityEngine.Timeline.PlayableTrack
 201e3fde670b00545944bb3db215c80a UnityEngine.Timeline.dll:UnityEngine.Timeline.TimelineAsset
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:GoogleARCore.Anchor
+96d78198b65fc47ad2cec1d36483be16 Assembly-CSharp.dll:.EditBox
 2943e8ae16c711189725f35aca5e0187 Assembly-CSharp.dll:.LoadingBehaviour
 be8b29ecd05b56bbfb5cc0e39b16c11b Assembly-CSharp.dll:UnityStandardAssets.Characters.FirstPerson.FirstPersonController
 e7a73f5f78ba6445195ec23b74a1ce2d Unity.TextMeshPro.dll:TMPro.TMP_ScrollbarEventHandler
@@ -100,6 +101,7 @@ abf1930d8126d0b2e00e9449129a0190 UnityEngine.UI.dll:UnityEngine.EventSystems.Tou
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:UnityStandardAssets.Vehicles.Ball.BallUserControl
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.CloseApplication
 2954799fca8619b20e8579fa259902c3 Assembly-CSharp.dll:.CubeDescription
+92df9c1890810980ed53cc8df0b4143e Assembly-CSharp.dll:.ListItemScript
 e540a01426f9ad59088593bf72bcd255 Assembly-CSharp.dll:UnityStandardAssets.Utility.TimedObjectActivator
 71bb6a6b6c8f052f948db64c7dd3ca4f UnityEngine.Timeline.dll:UnityEngine.Timeline.ActivationPlayableAsset
 06f0fef534ca4c1d6064fd77a26bf722 UnityEngine.Timeline.dll:UnityEngine.Timeline.ActivationTrack
@@ -228,16 +230,17 @@ c88c4199b288356ec3eb2f0d85abc619 Assembly-CSharp.dll:UnityStandardAssets.CrossPl
 a4d879eed97e8d86fd752672fc026fa2 Assembly-CSharp.dll:UnityStandardAssets.Utility.AutoMoveAndRotate
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:.ForcedReset
 f8bd7a92bf9f22d289759689ae7b1fd4 Assembly-CSharp.dll:UnityStandardAssets.Utility.SmoothFollow
+adbd7f60963119cee3ebc17e90009e90 Assembly-CSharp.dll:.ListScript
 71bb6a6b6c8f052f948db64c7dd3ca4f Unity.Analytics.Editor.dll:UnityEditor.Analytics.AnalyticsEventTrackerEditor
 71bb6a6b6c8f052f948db64c7dd3ca4f Unity.TextMeshPro.dll:TMPro.TMP_SpriteAnimator
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:AR.PointcloudVisualizer
 4d9afee0ad94e6260295dc34e98067f0 Assembly-CSharp.dll:.Scaling
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:UnityStandardAssets.Utility.ObjectResetter
 afc5b93a7b192de2dcb3832fe35a5c7e Assembly-CSharp.dll:.RotationScript
+6faf24ae1183243a579060590b1b6454 Assembly-CSharp.dll:.SelectWorld
 4fd8bf02e3089425d3502e26c44ba31a Unity.TextMeshPro.dll:TMPro.TextContainer
 5dbc7e900d58f5bd9e2b60a05c6e70cc Assembly-CSharp.dll:.AutoJump
 71bb6a6b6c8f052f948db64c7dd3ca4f Assembly-CSharp.dll:Assets.Standard_Assets.Editor.PlatformUpdate
-1c7604f1fd3f070c92c2b557c9b85454 Assembly-CSharp.dll:.SceneLoader
 ac86ed454268e28da6ee8b03452eb077 Assembly-CSharp.dll:Assets.Standard_Assets.CrossPlatformInput.Scripts.ToggleHandler
 e6ae40841db498b6e673877ac45ad208 UnityEngine.Networking.dll:UnityEngine.Networking.NetworkAnimator
 71bb6a6b6c8f052f948db64c7dd3ca4f UnityEngine.Networking.dll:UnityEngine.Networking.NetworkBehaviour
@@ -260,7 +263,6 @@ aa82b3ce4c0c9b227036c0337315c5d3 Unity.TextMeshPro.dll:TMPro.TMP_FontAsset
 d66f7c03535320e7a319dce64bc6ac86 Assembly-CSharp.dll:.CreateQuads
 e51c09a4cc447f11db225afcd8e3e490 Unity.TextMeshPro.dll:TMPro.TMP_Settings
 76b945b547f74d79302f337813e6c0be Assembly-CSharp.dll:UnityStandardAssets.Characters.FirstPerson.RigidbodyFirstPersonController
-a12536b07336da83b27ee5083cb44683 Assembly-CSharp.dll:.FpsMinecraftInputs
 dcdbe5f60453abb48bd1e2d8226c4519 Assembly-CSharp.dll:GoogleARCore.ARCoreSession
 71bb6a6b6c8f052f948db64c7dd3ca4f UnityEngine.Advertisements.dll:UnityEngine.Advertisements.CallbackExecutor
 cf96e5f7b3d069bab453925bd41be04e UnityEngine.TestRunner.dll:UnityEngine.TestTools.EnumerableSetUpTearDownCommandState
@@ -284,6 +286,7 @@ c933b2cffdb9d1429a103e9d63c523ef Assembly-CSharp.dll:UnityStandardAssets.Utility
 03b9ef2ed536e8d6280069f2195174da Assembly-CSharp.dll:UnityStandardAssets.Utility.SimpleActivatorMenu
 e9dcf27602fc3f2a0e146bc322cfdfca Assembly-CSharp.dll:Assets.Scripts.StaticWorld
 a4f0a4f62100f1a4fb5cbe0e00dde83f Unity.TextMeshPro.dll:TMPro.TextMeshProUGUI
+a12536b07336da83b27ee5083cb44683 Assembly-CSharp.dll:.MenuScript
 5fc094978ce3e3591a7500ed380d854a Unity.Analytics.DataPrivacy.dll:UnityEngine.Analytics.DataPrivacyButton
 d251bf88db6c95a6b1aa0b69298da9ef UnityEngine.SpatialTracking.dll:UnityEngine.SpatialTracking.TrackedPoseDriver
 49dcb3939f87870ac10cf1f8fcdfb35e Assembly-CSharp.dll:UnityStandardAssets.Utility.FollowTarget
@@ -369,7 +372,3 @@ ae91c545dea6ac849dd81c4b660c68ca Vuforia.UnityExtensions.dll:Vuforia.VuforiaConf
 fbbf64dcbe0662e3eda1dec45ea8f895 Vuforia.UnityExtensions.dll:Vuforia.WireframeBehaviour
 71bb6a6b6c8f052f948db64c7dd3ca4f Vuforia.UnityExtensions.dll:Vuforia.WireframeTrackableEventHandler
 47cd05cf11ce8beb2fd9a1522f58f5ec Assembly-CSharp.dll:UnityStandardAssets.Utility.AutoMobileShaderSwitch
-e5ed3c8c16b298448f5f4207704c4433 Assembly-CSharp.dll:.EditBox
-92df9c1890810980ed53cc8df0b4143e Assembly-CSharp.dll:.ListItemScript
-4bf9813ba3ad27c86514263bbd5795cf Assembly-CSharp.dll:.ListScript
-a12536b07336da83b27ee5083cb44683 Assembly-CSharp.dll:.MenuScript

@@ -5,18 +5,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Xml.Serialization;
 using Assets;
+using Assets.Minecraft.Scripts.Data;
 using Assets.Scripts;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 public class SaveManager
 {
-    public string SelectedSave { get; set; } = null;
-
-    public string SelectedSaveFullPath => this.GetSavePath(this.SelectedSave);
+    public string SelectedSaveFullPath => this.GetSavePath(GameData.SelectedSave);
 
     public string Extention { get; } = "save";
 
@@ -26,6 +26,22 @@ public class SaveManager
 
     private static SaveManager instance;
     public static SaveManager Instance => instance ?? (instance = new SaveManager());
+
+    public void Delete(string saveName)
+    {
+        saveName = this.GetSavePath(saveName);
+
+        File.Delete(saveName);
+    }
+
+    //// RENAME
+    public void Rename(string oldName, string newName)
+    {
+        oldName = this.GetSavePath(oldName);
+        newName = this.GetSavePath(newName);
+
+        File.Move(oldName, newName);
+    }
 
     //// SAVE
     public void SaveData(StaticWorld world) => this.SaveData(world, this.SelectedSaveFullPath);
